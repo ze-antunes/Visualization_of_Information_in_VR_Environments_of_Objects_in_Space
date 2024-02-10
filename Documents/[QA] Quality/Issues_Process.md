@@ -26,7 +26,7 @@ The category of each task begins with the abbreviation of the area in which the 
 - DEV: Development
 - QA: Quality
 - REQ: Requirements
-- EDU: related to educational activities
+- EXP: Exploration
 
 ## Task Appointment
 
@@ -42,7 +42,7 @@ NOTE:
 1. Every task must be associated with a ticket ID, as stipulated in the naming rules above
 2. Every task must include a DOD (definition of done); checking this is related to validation activity
 3. Every task must have a related validation activity; this validation activity cannot be performed by the task owner
-4. Every task definition must include an effort estimate (/estimate) in min using the Fibbonacci sequence of Pommodoros (1,2,3,5,8 - maximum acceptable is 8 pommodoros)
+4. Every task definition must include an effort estimate in hours or minutes
 5. After each task is completed, the time required must be updated
 
 # Template Task Definition _(copy and paste in the description of each issue)_
@@ -52,7 +52,7 @@ NOTE:
 ```
 **DOD:** _fill definition of done_
 
-**Effort Estimate _(in min)_:** _fill according to Fibbonacci of Pommodoros (1,2,3,5,8), one Pommodoro being 25 min (which means 25,50,75,125 or 200 min)_
+**Effort Estimate _(in h/min)_:** _fill the amount of time that you think the task will take to complete_
 
 **Required Time _(in min)_:** _fill actual amount of time used to complete_
 ```

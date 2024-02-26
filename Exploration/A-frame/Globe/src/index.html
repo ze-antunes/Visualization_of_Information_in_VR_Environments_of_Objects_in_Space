@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
-    <a-scene>
+    <a-scene id="myScene">
       <a-assets>
         <a-asset-item
           id="globeModel"
@@ -19,14 +19,6 @@
       </a-assets>
 
       <a-entity environment></a-entity>
-
-      <!-- <a-gltf-model
-        id="globe"
-        position="0 2.5 -3"
-        scale="0.1 0.1 0.1"
-        src="#globeModel"
-      ></a-gltf-model> -->
-      <a-entity custom-three-js-object></a-entity>
     </a-scene>
     <canvas class="webgl"></canvas>
     <script type="module" src="./script.js"></script>

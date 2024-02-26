@@ -1,116 +1,120 @@
 // import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import gsap from 'gsap'
 import GUI from 'lil-gui'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+
+// Get the A-Frame scene element
+let aframeScene = document.querySelector('#myScene');
+
+// Access the underlying Three.js scene object
+let scene = aframeScene.object3D;
+
+// Debug 
+const gui = new GUI({
+    width: 300,
+    title: "Debug UI",
+    closeFolders: true
+});
+// gui.close()
+// gui.hide()
+
+window.addEventListener('keydown', (e) => {
+    if (e.key == "h")
+        gui.show(gui._hidden)
+})
+
+// Loader and Models
+let gltfLoader = new GLTFLoader()
+let globe
+let globeTweaks = gui.addFolder("Globe")
+
+gltfLoader.load(
+    'https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/3D_Models/earth_globe/scene.gltf',
+    (gltf) => {
+        console.log('success')
+        console.log(gltf)
+
+        globe = gltf.scene.children[0].children[0].children[0].children[0]
+        globe.position.set(1, 1, -3);
+        globe.scale.set(0.05, 0.05, 0.05)
+        scene.add(globe)
+
+        globeTweaks
+            .add(globe.position, 'x')
+            .min(-3)
+            .max(3)
+            .step(0.01)
+            .name('cube x-pos');
+
+        globeTweaks
+            .add(globe.position, 'y')
+            .min(1)
+            .max(3)
+            .step(0.01)
+            .name('cube y-pos');
+
+        globeTweaks
+            .add(globe.position, 'z')
+            .min(-3)
+            .max(3)
+            .step(0.01)
+            .name('cube z-pos');
+
+        // Access materials of the loaded GLTF model
+        globe.traverse((child) => {
+            if (child.isMesh) {
+                console.log(child.material); // log the material of each mesh
+
+                globeTweaks
+                    .add(child.material, 'visible').name(`material id ${child.material.id}`);;
+            }
+        });
+    },
+    (progress) => {
+        console.log('progress')
+        console.log(progress)
+    },
+    (error) => {
+        console.log('error')
+        console.log(error)
+    },
+)
 
 /**
- * GUI
+ * Object
  */
-let gui = new GUI()
+let geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2);
+let material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+let mesh = new THREE.Mesh(geometry, material);
+mesh.position.set(-1, 1, -3);
 
-// /**
-//  * Base
-//  */
-// // Canvas
-// let canvas = document.querySelector('canvas.webgl')
+let cubeTweaks = gui.addFolder("Cube")
 
-// // Scene
-// let scene = new THREE.Scene()
+cubeTweaks
+    .add(mesh.position, 'x')
+    .min(-3)
+    .max(3)
+    .step(0.01)
+    .name('cube x-pos');
 
+cubeTweaks
+    .add(mesh.position, 'y')
+    .min(1)
+    .max(3)
+    .step(0.01)
+    .name('cube y-pos');
 
-AFRAME.registerComponent('custom-three-js-object', {
-    init: function () {
-        // Create a Three.js mesh
-        let geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2);
-        let material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        let mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(0, 1, -3);
+cubeTweaks
+    .add(mesh.position, 'z')
+    .min(-3)
+    .max(3)
+    .step(0.01)
+    .name('cube z-pos');
 
-        gui.add(mesh.position, 'y').min(1).max(3).step(0.01).name('globe y-pos');
-        gui.add(material, 'wireframe');
+cubeTweaks
+    .add(material, 'visible');
+    
+cubeTweaks
+    .add(material, 'wireframe');
 
-        // Access the A-Frame object3D property to attach the Three.js mesh
-        this.el.setObject3D('mesh', mesh);  
-    }
-});
-
-// /**
-//  * Object
-//  */
-// let geometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2)
-// let material = new THREE.MeshBasicMaterial({ color: '#ff0000' })
-// let mesh = new THREE.Mesh(geometry, material)
-// scene.add(mesh)
-// // let entity = document.getElementById("globe")
-// // let threeObject = entity.getObject3D('mesh')
-
-// // setTimeout(() => {
-// //     gui.add(entity.getAttribute('position'), 'y').min(1).max(3).step(0.01).name('globe y-pos')
-// // }, 5000)
-
-// /**
-//  * Sizes
-//  */
-// let sizes = {
-//     width: window.innerWidth,
-//     height: window.innerHeight
-// }
-
-// window.addEventListener('resize', () =>
-// {
-//     // Update sizes
-//     sizes.width = window.innerWidth
-//     sizes.height = window.innerHeight
-
-//     // Update camera
-//     camera.aspect = sizes.width / sizes.height
-//     camera.updateProjectionMatrix()
-
-//     // Update renderer
-//     renderer.setSize(sizes.width, sizes.height)
-//     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-// })
-
-// /**
-//  * Camera
-//  */
-// // Base camera
-// let camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-// camera.position.x = 1
-// camera.position.y = 1
-// camera.position.z = 2
-// scene.add(camera)
-
-// // Controls
-// let controls = new OrbitControls(camera, canvas)
-// controls.enableDamping = true
-
-// /**
-//  * Renderer
-//  */
-// let renderer = new THREE.WebGLRenderer({
-//     canvas: canvas
-// })
-// renderer.setSize(sizes.width, sizes.height)
-// renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-
-// /**
-//  * Animate
-//  */
-// let clock = new THREE.Clock()
-
-// let tick = () =>
-// {
-//     let elapsedTime = clock.getElapsedTime()
-
-//     // Update controls
-//     controls.update()
-
-//     // Render
-//     renderer.render(scene, camera)
-
-//     // Call tick again on the next frame
-//     window.requestAnimationFrame(tick)
-// }
-
-// tick()
+// Access the A-Frame object3D property to attach the Three.js mesh
+scene.add(mesh);  

@@ -1,16 +1,16 @@
 import * as THREE from 'three';
 import GUI from 'lil-gui'
+import gsap from 'gsap'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import * as GeometryUtils from 'three/examples/jsm/utils/GeometryUtils'
-import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry'
-import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial'
-import { Line2 } from 'three/examples/jsm/lines/Line2'
 
 // Get the A-Frame scene element
 let aframeScene = document.querySelector('#myScene');
 
 // Access the underlying Three.js scene object
 let scene = aframeScene.object3D;
+
+const debugObject = {
+}
 
 // Debug 
 let gui = new GUI({
@@ -62,6 +62,12 @@ gltfLoader.load(
             .step(0.01)
             .name('cube z-pos');
 
+        debugObject.spin = () => {
+            gsap.to(globe.rotation, { y: globe.rotation.y + Math.PI * 2 })
+        }
+
+        globeTweaks.add(debugObject, 'spin')
+
         // Access materials of the loaded GLTF model
         globe.traverse((child) => {
             if (child.isMesh && child.material.map && child.material.map.normalMap) {
@@ -91,8 +97,9 @@ gltfLoader.load(
  * Object
  */
 // Cube 
+debugObject.color = "#e00000"
 let cubeGeometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2);
-let cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+let cubeMaterial = new THREE.MeshBasicMaterial({ color: debugObject.color });
 let cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
 cubeMesh.position.set(-1, 1, -3);
 scene.add(cubeMesh);
@@ -114,13 +121,22 @@ scene.add(cubeMesh);
 
 // Curved Line 
 //Create a closed wavey loop
+debugObject.segments = 20;
+debugObject.points = {
+    point1: { x: 2, y: 7, z: -5 },
+    point2: { x: 0, y: 4, z: -5 },
+    point3: { x: -2, y: 4, z: -5 }
+};
+
+console.log(debugObject.points.point1)
+
 let curve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(2, 4, -5),
-    new THREE.Vector3(0, 4, -5),
-    new THREE.Vector3(-2, 4, -5)
+    new THREE.Vector3(debugObject.points.point1.x, debugObject.points.point1.y, debugObject.points.point1.z),
+    new THREE.Vector3(debugObject.points.point2.x, debugObject.points.point2.y, debugObject.points.point2.z),
+    new THREE.Vector3(debugObject.points.point3.x, debugObject.points.point3.y, debugObject.points.point3.z),
 ]);
 
-let curvePoints = curve.getPoints(50);
+let curvePoints = curve.getPoints(debugObject.segments);
 let curveGeometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
 
 let curveMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
@@ -133,6 +149,10 @@ scene.add(curveObject)
 // GUI  
 let cubeTweaks = gui.addFolder("Cube")
 let curveTweaks = gui.addFolder("Curve")
+let pointsPositions = curveTweaks.addFolder("Points")
+let point1 = pointsPositions.addFolder("Point 1")
+let point2 = pointsPositions.addFolder("Point 2")
+let point3 = pointsPositions.addFolder("Point 3")
 
 
 cubeTweaks
@@ -161,3 +181,132 @@ cubeTweaks
 
 cubeTweaks
     .add(cubeMaterial, 'wireframe');
+
+cubeTweaks
+    .addColor(debugObject, 'color')
+    .onChange(() => {
+        cubeMaterial.color.set(debugObject.color)
+    })
+
+
+curveTweaks
+    .add(debugObject, 'segments')
+    .min(2)
+    .max(20)
+    .step(1)
+    .name('curve segments')
+    .onFinishChange((value) => {
+        curvePoints = curve.getPoints(value);
+        curveObject.geometry.dispose();
+        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+    })
+
+    
+point1
+    .add(debugObject.points.point1, 'x')
+    .min(-10)
+    .max(10)
+    .step(0.1)
+    .onChange((value) => {
+        curve.points[0].x = value
+        curvePoints = curve.getPoints(debugObject.segments);
+        curveObject.geometry.dispose();
+        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+    })
+
+point1
+    .add(debugObject.points.point1, 'y')
+    .min(-10)
+    .max(10)
+    .step(0.1)
+    .onChange((value) => {
+        curve.points[0].y = value
+        curvePoints = curve.getPoints(debugObject.segments);
+        curveObject.geometry.dispose();
+        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+    })
+
+point1
+    .add(debugObject.points.point1, 'z')
+    .min(-10)
+    .max(10)
+    .step(0.1)
+    .onChange((value) => {
+        curve.points[0].z = value
+        curvePoints = curve.getPoints(debugObject.segments);
+        curveObject.geometry.dispose();
+        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+    })
+
+point2
+    .add(debugObject.points.point2, 'x')
+    .min(-10)
+    .max(10)
+    .step(0.1)
+    .onChange((value) => {
+        curve.points[1].x = value
+        curvePoints = curve.getPoints(debugObject.segments);
+        curveObject.geometry.dispose();
+        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+    })
+
+point2
+    .add(debugObject.points.point2, 'y')
+    .min(-10)
+    .max(10)
+    .step(0.1)
+    .onChange((value) => {
+        curve.points[1].y = value
+        curvePoints = curve.getPoints(debugObject.segments);
+        curveObject.geometry.dispose();
+        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+    })
+
+point2
+    .add(debugObject.points.point2, 'z')
+    .min(-10)
+    .max(10)
+    .step(0.1)
+    .onChange((value) => {
+        curve.points[1].z = value
+        curvePoints = curve.getPoints(debugObject.segments);
+        curveObject.geometry.dispose();
+        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+    })
+
+point2
+    .add(debugObject.points.point2, 'x')
+    .min(-10)
+    .max(10)
+    .step(0.1)
+    .onChange((value) => {
+        curve.points[2].x = value
+        curvePoints = curve.getPoints(debugObject.segments);
+        curveObject.geometry.dispose();
+        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+    })
+
+point2
+    .add(debugObject.points.point2, 'y')
+    .min(-10)
+    .max(10)
+    .step(0.1)
+    .onChange((value) => {
+        curve.points[2].y = value
+        curvePoints = curve.getPoints(debugObject.segments);
+        curveObject.geometry.dispose();
+        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+    })
+
+point2
+    .add(debugObject.points.point2, 'z')
+    .min(-10)
+    .max(10)
+    .step(0.1)
+    .onChange((value) => {
+        curve.points[2].z = value
+        curvePoints = curve.getPoints(debugObject.segments);
+        curveObject.geometry.dispose();
+        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+    })
+

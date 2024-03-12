@@ -6,6 +6,11 @@
     <title>Globe Exploration 1</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-blink-controls/dist/aframe-blink-controls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.misc.min.js"></script>
+    <script src="https://unpkg.com/super-hands@^3.0.3/dist/super-hands.min.js"></script>
+    <script src="./pinchable.js"></script>
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
@@ -19,17 +24,62 @@
       </a-assets>
 
       <a-entity environment></a-entity>
+
+      <a-entity custom-three-js-object></a-entity>
+      <a-plane
+        color="yellow"
+        width="100"
+        height="100"
+        position="0 -0.01 0"
+        rotation="-90 0 0"
+      ></a-plane>
+
+      <a-box
+        pinchable
+        scale="0.1 0.1 0.1"
+        position="0 1 -0.5"
+        color="red"
+        event-set__pinchedstarted="color: lightblue"
+        event-set__pinchedended="color: blue"
+        event-set__click="color: yellow"
+      ></a-box>
+
+      <!-- hover & drag-drop won't have any obvious effect without some additional event handlers or components. See the examples page for more -->
+      <a-box
+        hoverable
+        grabbable
+        stretchable
+        draggable
+        droppable
+        color="blue"
+        position="0 0 -1"
+      ></a-box>
+
+      <a-entity id="guiContainer" position="1 1.5 -2" rotation="0 45 0">
+      </a-entity>
+
+      <a-entity
+        position="0 1.5 -2"
+        a-html="content: <div style='background-color: white; padding: 20px;'>This is HTML content within A-Frame.</div>"
+      ></a-entity>
+
+      <a-entity>
+        <a-camera camera wasd-controls look-controls></a-camera>
+        <a-entity
+          sphere-collider="objects: a-box"
+          super-hands
+          hand-controls="hand: left"
+        ></a-entity>
+        <a-entity
+          sphere-collider="objects: a-box"
+          super-hands
+          hand-controls="hand: right"
+          laser-controls="hand: right"
+          blink-controls="collisionEntities: a-plane,[color='red']"
+        ></a-entity>
+      </a-entity>
     </a-scene>
-    
-    <script type="importmap">
-			{
-				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/"
-				}
-			}
-		</script>
-    
+
     <script type="module" src="./script.js"></script>
   </body>
 </html>

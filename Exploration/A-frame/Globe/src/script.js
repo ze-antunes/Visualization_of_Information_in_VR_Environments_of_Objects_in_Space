@@ -31,67 +31,67 @@ let gltfLoader = new GLTFLoader()
 let globe
 let globeTweaks = gui.addFolder("Globe")
 
-gltfLoader.load(
-    'https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/3D_Models/earth_globe/scene.gltf',
-    (gltf) => {
-        console.log('success')
-        // console.log(gltf)
+// gltfLoader.load(
+//     'https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/3D_Models/earth_globe/scene.gltf',
+//     (gltf) => {
+//         console.log('success')
+//         // console.log(gltf)
 
-        globe = gltf.scene.children[0].children[0].children[0].children[0]
-        globe.position.set(1, 1, -3);
-        globe.scale.set(0.05, 0.05, 0.05)
+//         globe = gltf.scene.children[0].children[0].children[0].children[0]
+//         globe.position.set(1, 1, -3);
+//         globe.scale.set(0.05, 0.05, 0.05)
 
-        globeTweaks
-            .add(globe.position, 'x')
-            .min(-3)
-            .max(3)
-            .step(0.01)
-            .name('cube x-pos');
+//         globeTweaks
+//             .add(globe.position, 'x')
+//             .min(-3)
+//             .max(3)
+//             .step(0.01)
+//             .name('cube x-pos');
 
-        globeTweaks
-            .add(globe.position, 'y')
-            .min(1)
-            .max(3)
-            .step(0.01)
-            .name('cube y-pos');
+//         globeTweaks
+//             .add(globe.position, 'y')
+//             .min(1)
+//             .max(3)
+//             .step(0.01)
+//             .name('cube y-pos');
 
-        globeTweaks
-            .add(globe.position, 'z')
-            .min(-3)
-            .max(3)
-            .step(0.01)
-            .name('cube z-pos');
+//         globeTweaks
+//             .add(globe.position, 'z')
+//             .min(-3)
+//             .max(3)
+//             .step(0.01)
+//             .name('cube z-pos');
 
-        debugObject.spin = () => {
-            gsap.to(globe.rotation, { y: globe.rotation.y + Math.PI * 2 })
-        }
+//         debugObject.spin = () => {
+//             gsap.to(globe.rotation, { y: globe.rotation.y + Math.PI * 2 })
+//         }
 
-        globeTweaks.add(debugObject, 'spin')
+//         globeTweaks.add(debugObject, 'spin')
 
-        // Access materials of the loaded GLTF model
-        globe.traverse((child) => {
-            if (child.isMesh && child.material.map && child.material.map.normalMap) {
-                console.log(child.material); // log the material of each mesh
-                let texture = new THREE.TextureLoader().load('assets/' + child.material.map.normalMap);
-                let material = new THREE.MeshBasicMaterial({ map: texture });
-                child.material = material
+//         // Access materials of the loaded GLTF model
+//         globe.traverse((child) => {
+//             if (child.isMesh && child.material.map && child.material.map.normalMap) {
+//                 console.log(child.material); // log the material of each mesh
+//                 let texture = new THREE.TextureLoader().load('assets/' + child.material.map.normalMap);
+//                 let material = new THREE.MeshBasicMaterial({ map: texture });
+//                 child.material = material
 
-                globeTweaks
-                    .add(child.material, 'visible').name(`material id ${child.material.id}`);;
-            }
-        });
+//                 globeTweaks
+//                     .add(child.material, 'visible').name(`material id ${child.material.id}`);;
+//             }
+//         });
 
-        scene.add(globe)
-    },
-    (progress) => {
-        console.log('progress')
-        // console.log(progress)
-    },
-    (error) => {
-        console.log('error')
-        // console.log(error)
-    },
-)
+//         scene.add(globe)
+//     },
+//     (progress) => {
+//         console.log('progress')
+//         // console.log(progress)
+//     },
+//     (error) => {
+//         console.log('error')
+//         // console.log(error)
+//     },
+// )
 
 /**
  * Object
@@ -310,3 +310,18 @@ point2
         curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
     })
 
+AFRAME.registerComponent('custom-three-js-object', {
+    init: function () {
+        // Create a Three.js mesh
+        let torusGeometry = new THREE.TorusGeometry(0.4, 0.01, 20, 45)
+        let torusMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        let torusMesh = new THREE.Mesh(torusGeometry, torusMaterial);
+        torusMesh.position.set(0, 1, -3);
+        gui.add(torusMesh.position, 'y').min(1).max(3).step(0.01).name('globe y-pos');
+        scene.add(torusMesh);
+    }
+});
+
+let guiContainer = document.getElementById('guiContainer');
+let guiElement = gui.domElement;
+guiContainer.appendChild(guiElement);

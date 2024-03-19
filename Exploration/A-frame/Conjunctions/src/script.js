@@ -16,6 +16,17 @@ fetch("exp_conjunctions.json")
         console.error('There was a problem with the fetch operation:', error);
     });
 
+
+// Debug object
+let debugObject = {};
+
+// Debug GUI
+let gui = new GUI({
+    width: 300,
+    title: "Debug UI",
+    closeFolders: true
+});
+
 // Get the A-Frame scene element
 let aframeScene = document.querySelector('#myScene');
 console.log(aframeScene);
@@ -50,13 +61,6 @@ window.addEventListener('keydown', (e) => {
 
 
 // Target
-AFRAME.registerComponent('three-js-target', {
-    init: function () {
-        // Create a Three.js mesh
-        
-    }
-});
-
 let targetGeometry = new THREE.SphereGeometry(.1, 24, 16);
 let targetMaterial = new THREE.MeshStandardMaterial({ color: '#03fc28' });
 let targetMesh = new THREE.Mesh(targetGeometry, targetMaterial);
@@ -79,6 +83,39 @@ let ellipsoids2Material = new THREE.MeshStandardMaterial({
 let targetCovarianceMesh = new THREE.Mesh(targetCovarianceGeometry, ellipsoids2Material);
 targetCovarianceMesh.position.set(-0.7, 1, -3);
 scene.add(targetCovarianceMesh);
+
+AFRAME.registerComponent('three-js-target', {
+    init: function () {
+        // Create a target group
+        let target = new THREE.Group();
+        target.add(targetMesh, targetCovarianceMesh);
+        scene.add(target)
+    }
+});
+
+
+//Test Object
+let sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+let sphereMesh = new THREE.Mesh(sphereGeometry, targetMaterial);
+sphereMesh.position.set(0, 1, 0)
+sphereMesh.castShadow = true; //default is false
+sphereMesh.receiveShadow = true;
+let aframeEntity = document.querySelector('#myEntityTest');
+let entityObject3D = aframeEntity.object3D;
+entityObject3D.castShadow = true; //default is false
+entityObject3D.receiveShadow = true;
+entityObject3D.material = targetMaterial;
+entityObject3D.add(sphereMesh);
+
+gui
+    .add(entityObject3D.position, 'z')
+    .min(-5)
+    .max(1)
+    .step(0.01)
+    .name('test object x-pos')
+    .onChange((value) => {
+        console.log(value)
+    })
 
 
 // Chaser
@@ -108,8 +145,10 @@ scene.add(chaserCovarianceMesh);
 
 AFRAME.registerComponent('three-js-chaser', {
     init: function () {
-        // Create a Three.js mesh 
-
+        // Create a chaser group
+        let chaser = new THREE.Group();
+        chaser.add(chaserMesh, chaserCovarianceMesh);
+        scene.add(chaser)
     }
 });
 
@@ -226,16 +265,6 @@ rightW.receiveShadow = true;
 
 scene.add(floor, frontW, leftW, rightW)
 
-// Debug object
-let debugObject = {};
-
-// Debug GUI
-let gui = new GUI({
-    width: 300,
-    title: "Debug UI",
-    closeFolders: true
-});
-
 //Lights
 let lightsTweaks = gui.addFolder("Lights")
 let ambientLight = new THREE.AmbientLight(0xffffff, 0)
@@ -262,9 +291,9 @@ const pointSphereMesh = new THREE.Mesh(pointSphereGeometry, pointSphereMaterial)
 pointSphereMesh.position.set(2, 2, - 1);
 
 lightsTweaks.add(pointLight, 'intensity').min(0).max(3).step(0.001).name("pointLight intensity")
-lightsTweaks.add(pointLight.position, 'x').min(- 5).max(5).step(0.001).onChange((value) => {pointSphereMesh.position.x = value})
-lightsTweaks.add(pointLight.position, 'y').min(- 5).max(5).step(0.001).onChange((value) => {pointSphereMesh.position.y = value})
-lightsTweaks.add(pointLight.position, 'z').min(- 5).max(5).step(0.001).onChange((value) => {pointSphereMesh.position.z = value})
+lightsTweaks.add(pointLight.position, 'x').min(- 5).max(5).step(0.001).onChange((value) => { pointSphereMesh.position.x = value })
+lightsTweaks.add(pointLight.position, 'y').min(- 5).max(5).step(0.001).onChange((value) => { pointSphereMesh.position.y = value })
+lightsTweaks.add(pointLight.position, 'z').min(- 5).max(5).step(0.001).onChange((value) => { pointSphereMesh.position.z = value })
 
 const sphereSize = 1;
 const pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);

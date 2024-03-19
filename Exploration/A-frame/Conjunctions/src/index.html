@@ -24,22 +24,34 @@
 
       <!-- <a-entity shadow="receive: true" environment></a-entity> -->
 
-      <a-entity
+      <a-sphere
         hoverable
         grabbable
         stretchable
         draggable
         droppable
         three-js-target
-      ></a-entity>
-      <a-entity
+      ></a-sphere>
+      <a-sphere
         hoverable
         grabbable
         stretchable
         draggable
         droppable
         three-js-chaser
-      ></a-entity>
+      ></a-sphere>
+
+      <a-box
+        hoverable
+        grabbable
+        stretchable
+        draggable
+        droppable
+        color="blue"
+        position="0 1 -2"
+        id="myEntityTest"
+        three-js-test
+      ></a-box>
 
       <a-entity>
         <a-camera id="myCamera" camera wasd-controls look-controls></a-camera>

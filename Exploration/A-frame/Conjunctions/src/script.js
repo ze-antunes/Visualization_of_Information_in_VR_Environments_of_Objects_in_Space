@@ -8,7 +8,7 @@ let conjunctionData;
 fetch("exp_conjunctions.json")
     .then(response => response.json())
     .then(data => {
-        console.log(data);
+        // console.log(data);
         conjunctionData = data;
     })
     .catch(error => {
@@ -29,7 +29,7 @@ let gui = new GUI({
 
 // Get the A-Frame scene element
 let aframeScene = document.querySelector('#myScene');
-console.log(aframeScene);
+// console.log(aframeScene);
 
 // Access the underlying Three.js scene object
 let scene = aframeScene.object3D;
@@ -43,14 +43,39 @@ let aframeCamera = document.querySelector('#myCamera');
 let cameraComponent = aframeCamera.components;
 let camera
 
+/**
+ * Sizes
+ */
+const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
+}
+
+window.addEventListener('resize', () => {
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+})
+
 // Access the underlying Three.js renderer object
 let renderer
-console.log(renderer, 1)
+
+
 setTimeout(() => {
     camera = cameraComponent.camera.camera;
 
-    renderer = aframeScene.renderer
+    renderer = aframeScene.renderer;
     renderer.shadowMap.enabled = true;
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     // targetObject3D.children[0].geometry = targetCovarianceGeometry
@@ -58,78 +83,64 @@ setTimeout(() => {
     // chaserObject3D.children[0].geometry = chaserCovarianceGeometry
     // chaserObject3D.children[0].rotation.set(2, 10, -3);
     // chaserObject3D.children[0].material.opacity = 0;
-}, 1000)
+    // console.log(targetEntity)
+}, 100)
 
 window.addEventListener('keydown', (e) => {
     if (e.key == "h")
         gui.show(gui._hidden);
 });
 
-
+// Objects
 // Target
-let targetEntity = document.querySelector('#target');
-let targetObject3D = targetEntity.object3D;
+AFRAME.registerComponent('three-js-target', {
+    init: function () {
+        let targetEntity = document.querySelector('#target');
+        let targetObject3D = targetEntity.object3D;
+        let targetMaterial = targetObject3D.children[0].material
 
-let targetGeometry = new THREE.SphereGeometry(.1, 24, 16);
-let targetMaterial = new THREE.MeshStandardMaterial({ color: '#03fc28' });
-let targetMesh = new THREE.Mesh(targetGeometry, targetMaterial);
-// targetMesh.position.set(-0.7, 1, -3);
-targetMesh.castShadow = true; //default is false
-targetMesh.receiveShadow = true;
+        // console.log(targetEntity, targetObject3D) 
+        targetObject3D.children[0].geometry = new THREE.SphereGeometry(.1, 24, 16);
+        targetMaterial.color = new THREE.Color('#03fc28')
+        targetObject3D.position.set(-0.7, 1, -1);
+    }
+});
 
 let targetCovarianceGeometry = new THREE.SphereGeometry(0.5, 24, 16);
 targetCovarianceGeometry.rotateZ(Math.PI / 2);
 targetCovarianceGeometry.scale(2.3, .5, .4);
 
-let targetCovarianceMaterial = new THREE.MeshStandardMaterial({
+let ellipsoids2Material = new THREE.MeshStandardMaterial({
     color: '#03fc28',
     transparent: true,
     opacity: 0.2,
     side: THREE.DoubleSide
 });
 
-let targetCovarianceMesh = new THREE.Mesh(targetCovarianceGeometry, targetCovarianceMaterial);
-// targetCovarianceMesh.position.set(-0.7, 1, -3);
+let targetCovarianceMesh = new THREE.Mesh(targetCovarianceGeometry, ellipsoids2Material);
+targetCovarianceMesh.position.set(-0.7, 1, -1);
 
-// target.add(targetMesh, targetCovarianceMesh)
-targetObject3D.add(targetMesh, targetCovarianceMesh)
-// scene.add(targetMesh, targetCovarianceMesh);
-
-// //Test Object
-// let sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-// let sphereMesh = new THREE.Mesh(sphereGeometry, targetMaterial);
-// sphereMesh.position.set(0, 0, 0)
-// sphereMesh.castShadow = true; //default is false
-// sphereMesh.receiveShadow = true;
-// let aframeEntity = document.querySelector('#myEntityTest');
-// let entityObject3D = aframeEntity.object3D;
-// entityObject3D.castShadow = true; //default is false
-// entityObject3D.receiveShadow = true;
-// entityObject3D.material = targetMaterial;
-// entityObject3D.add(sphereMesh);
-
-// gui
-//     .add(entityObject3D.position, 'z')
-//     .min(-5)
-//     .max(1)
-//     .step(0.01)
-//     .name('test object x-pos')
-//     .onChange((value) => {
-//         console.log(value)
-//     })
-
+AFRAME.registerComponent('three-js-target-covariance', {
+    init: function () {
+        let targetCovarianceEntity = document.querySelector('#targetCovariance');
+        let targetCovarianceObject3D = targetCovarianceEntity.object3D;
+        targetCovarianceObject3D.add(targetCovarianceMesh)
+    }
+});
 
 // Chaser
-let chaserEntity = document.querySelector('#chaser');
-let chaserObject3D = chaserEntity.object3D;
+AFRAME.registerComponent('three-js-chaser', {
+    init: function () {
+        let chaserEntity = document.querySelector('#chaser');
+        let chaserObject3D = chaserEntity.object3D;
+        let chaserMaterial = chaserObject3D.children[0].material
 
-let chaserGeometry = new THREE.SphereGeometry(.1, 24, 16);
-let chaserMaterial = new THREE.MeshStandardMaterial({ color: '#0388fc' });
-let chaserMesh = new THREE.Mesh(chaserGeometry, chaserMaterial);
-// chaserMesh.position.set(0.7, 1, -3);
-chaserMesh.castShadow = true; //default is false
-chaserMesh.receiveShadow = true;
-// scene.add(chaserMesh);
+        // console.log(chaserEntity, chaserObject3D) 
+        chaserObject3D.children[0].geometry = new THREE.SphereGeometry(.1, 24, 16);
+        chaserMaterial.color = new THREE.Color('#0388fc')
+        chaserObject3D.position.set(0.7, 1, -1);
+    }
+});
 
 let chaserCovarianceGeometry = new THREE.SphereGeometry(0.5, 24, 16);
 chaserCovarianceGeometry.rotateZ(Math.PI / 2);
@@ -143,26 +154,24 @@ let chaserCovarianceMaterial = new THREE.MeshStandardMaterial({
 });
 
 let chaserCovarianceMesh = new THREE.Mesh(chaserCovarianceGeometry, chaserCovarianceMaterial);
-// chaserCovarianceMesh.position.set(0.7, 1, -3);
+chaserCovarianceMesh.position.set(0.7, 1, -1);
 chaserCovarianceMesh.rotation.set(2, 10, -3);
-// scene.add(chaserCovarianceMesh);
 
-chaserObject3D.add(chaserMesh, chaserCovarianceMesh)
+AFRAME.registerComponent('three-js-chaser-covariance', {
+    init: function () {
+        let chaserCovarianceEntity = document.querySelector('#chaserCovariance');
+        let chaserCovarianceObject3D = chaserCovarianceEntity.object3D;
+        chaserCovarianceObject3D.add(chaserCovarianceMesh)
+    }
+});
 
-// AFRAME.registerComponent('three-js-chaser', {
-//     init: function () {
-//         this.el.setAttribute('scale', '2 1 0.5'); // Set the scale of the entity
-//     }
-// });
-
-
-// Target / Chaser Intersection 
+// Target / Chaser Intersection
 function checkTwoShapeIntersect(object1, object2) {
     /**
      * This function check if two object3d intersect or not
      * @param {THREE.Object3D} object1
      * @param {THREE.Object3D} object2
-     * @returns {Boolean} 
+     * @returns {Boolean}
     */
 
     // Check for intersection using bounding box intersection test
@@ -181,19 +190,35 @@ function checkTwoShapeIntersect(object1, object2) {
     }
 }
 
-// checkTwoShapeIntersect(target, chaserCovarianceMesh)
+// checkTwoShapeIntersect(targetCovarianceObject3D, chaserCovarianceMesh)
 
-targetCovarianceMesh.updateMatrix();
-chaserCovarianceMesh.updateMatrix();
+
+// AFRAME.registerComponent('three-js-intersection', {
+//     init: function () {
+//         let targetCovarianceEntity = document.querySelector('#targetCovariance');
+//         let targetCovarianceMesh = targetCovarianceEntity.object3D.children[0];
+//         // chaserCovarianceObject3D.position.set(0.7, 1, -1);
+//         console.log(targetCovarianceMesh)
+//         let chaserCovarianceEntity = document.querySelector('#chaserCovariance');
+//         let chaserCovarianceMesh = chaserCovarianceEntity.object3D.children[0];
+//         // chaserCovarianceObject3D.position.set(0.7, 1, -1);
+//         console.log(chaserCovarianceMesh)
+
+//         targetCovarianceMesh.updateMatrix();
+//         // chaserCovarianceMesh.updateMatrix();
+//     }
+// });
+
+targetCovarianceMesh.updateMatrix()
+chaserCovarianceMesh.updateMatrix()
+
 let intRes = CSG.intersect(targetCovarianceMesh, chaserCovarianceMesh);
 intRes.material = new THREE.MeshBasicMaterial({
     color: 'red',
     side: THREE.DoubleSide
 });
-// console.log(intRes.material)
-intRes.position.set(0, 1, -3);
-intRes.castShadow = true; //default is false
-intRes.receiveShadow = true;
+intRes.position.set(-0.7, 1, -1);
+intRes.scale.set(0.999, 0.999, 0.999);
 scene.add(intRes)
 
 //Update the intersection after changes
@@ -214,99 +239,88 @@ function handleIntersectionUpdate(xPos, object) {
         side: THREE.DoubleSide
     });
     if (object == 0)
-        intRes.position.set(xPos, 1, -3);
+        intRes.position.set(xPos, 1, -1);
     if (object == 1) {
-        intRes.position.set(targetCovarianceMesh.position.x, 1, -3);
+        intRes.position.set(targetCovarianceMesh.position.x, 1, -1);
     }
+    intRes.scale.set(0.990, 0.990, 0.999);
     scene.add(intRes)
 }
 
+console.log("ole")
 
 // Walls 
 // Floor 
 let floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(7, 5),
+    new THREE.PlaneGeometry(4, 4),
     new THREE.MeshStandardMaterial({ color: 'lightgrey' })
 )
 floor.rotation.x = - Math.PI * 0.5
-floor.position.z = -2.5
 // floor.castShadow = true; //default is false
 floor.receiveShadow = true;
 
 // Front Wall 
 let frontW = new THREE.Mesh(
-    new THREE.PlaneGeometry(7, 5),
+    new THREE.PlaneGeometry(4, 4),
     new THREE.MeshStandardMaterial({ color: 'lightgrey' })
 )
-frontW.position.z = -5
-frontW.position.y = 2.5
+frontW.position.z = -2
+frontW.position.y = 2
 // frontW.castShadow = true; //default is false
 frontW.receiveShadow = true;
 
-// Front Wall 
+// Back Wall 
 let backW = new THREE.Mesh(
-    new THREE.PlaneGeometry(7, 5),
+    new THREE.PlaneGeometry(4, 4),
     new THREE.MeshStandardMaterial({ color: 'lightgrey' })
 )
 backW.rotation.y = Math.PI
-backW.position.z = 0
-backW.position.y = 2.5
+backW.position.z = 2
+backW.position.y = 2
 // backW.castShadow = true; //default is false
 backW.receiveShadow = true;
 
 // Left Wall 
 let leftW = new THREE.Mesh(
-    new THREE.PlaneGeometry(5, 5),
+    new THREE.PlaneGeometry(4, 4),
     new THREE.MeshStandardMaterial({ color: 'lightgrey' })
 )
 leftW.rotation.x = - Math.PI * 0.5
 leftW.rotation.y = Math.PI * 0.5
-leftW.position.x = -3.5
-leftW.position.y = 2.5
-leftW.position.z = -2.5
+leftW.position.x = -2
+leftW.position.y = 2
 // leftW.castShadow = true; //default is false
 leftW.receiveShadow = true;
 
 // Right Wall 
 let rightW = new THREE.Mesh(
-    new THREE.PlaneGeometry(5, 5),
+    new THREE.PlaneGeometry(4, 4),
     new THREE.MeshStandardMaterial({ color: 'lightgrey' })
 )
 rightW.rotation.x = - Math.PI * 0.5
 rightW.rotation.y = - Math.PI * 0.5
-rightW.position.x = 3.5
-rightW.position.y = 2.5
-rightW.position.z = -2.5
+rightW.position.x = 2
+rightW.position.y = 2
 // rightW.castShadow = true; //default is false
 rightW.receiveShadow = true;
-
 
 scene.add(floor, frontW, backW, leftW, rightW)
 
 //Lights
 let lightsTweaks = gui.addFolder("Lights")
-let ambientLight = new THREE.AmbientLight(0xffffff, 0)
+let ambientLight = new THREE.AmbientLight(0xffffff, .6)
 lightsTweaks.add(ambientLight, 'intensity').min(0).max(3).step(0.001).name("ambientLight intensity")
 scene.add(ambientLight)
 
-// // Directional light
-// let directionalLight = new THREE.DirectionalLight(0xffffff, 0.3)
-// directionalLight.position.set(2, 2, - 1)
-// lightsTweaks.add(directionalLight, 'intensity').min(0).max(3).step(0.001).name("directionalLight intensity")
-// lightsTweaks.add(directionalLight.position, 'x').min(- 5).max(5).step(0.001)
-// lightsTweaks.add(directionalLight.position, 'y').min(- 5).max(5).step(0.001)
-// lightsTweaks.add(directionalLight.position, 'z').min(- 5).max(5).step(0.001)
-// scene.add(directionalLight)
-
 // Point light 
 const pointLight = new THREE.PointLight(0xffffff, 0.4, 100);
-pointLight.position.set(2, 2, - 1);
+pointLight.position.set(1, 2, - 1.5);
 pointLight.castShadow = true;
 
 const pointSphereGeometry = new THREE.SphereGeometry(0.1, 24, 16);
 const pointSphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
 const pointSphereMesh = new THREE.Mesh(pointSphereGeometry, pointSphereMaterial);
-pointSphereMesh.position.set(2, 2, - 1);
+pointSphereMesh.position.set(1, 2, - 1.5);
 
 lightsTweaks.add(pointLight, 'intensity').min(0).max(3).step(0.001).name("pointLight intensity")
 lightsTweaks.add(pointLight.position, 'x').min(- 5).max(5).step(0.001).onChange((value) => { pointSphereMesh.position.x = value })
@@ -326,9 +340,6 @@ targetTweaks
     .max(3)
     .step(0.01)
     .name('x-pos')
-    .onChange((value) => {
-        targetMesh.position.set(value, 0, 0)
-    })
     .onFinishChange((value) => {
         handleIntersectionUpdate(value, 0);
     })
@@ -339,9 +350,20 @@ chaserTweaks
     .max(3)
     .step(0.01)
     .name('x-pos')
-    .onChange((value) => {
-        chaserMesh.position.set(value, 0, 0)
-    })
     .onFinishChange((value) => {
         handleIntersectionUpdate(value, 1);
     })
+
+/**
+ * Animate
+ */
+const clock = new THREE.Clock()
+
+const tick = () => {
+    const elapsedTime = clock.getElapsedTime()
+
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
+}
+
+tick()

@@ -9,11 +9,12 @@
     "deploy": "vercel --prod"
   },
   "devDependencies": {
-    "lil-gui": "^0.19.1",
-    "vite": "^4.5.0"
+    "vite": "^5.0.12",
+    "vite-plugin-glsl": "^1.3.0"
   },
   "dependencies": {
     "gsap": "^3.12.2",
+    "lil-gui": "^0.19.1",
     "three": "^0.158.0",
     "vercel": "^33.5.2"
   }

@@ -1,327 +1,246 @@
 import * as THREE from 'three';
-import GUI from 'lil-gui'
-import gsap from 'gsap'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import GUI from 'lil-gui';
+import earthVertexShader from './shaders/earth/vertex.glsl'
+import earthFragmentShader from './shaders/earth/fragment.glsl'
 
-// Get the A-Frame scene element
-let aframeScene = document.querySelector('#myScene');
+import atmosphereVertexShader from './shaders/atmosphere/vertex.glsl'
+import atmosphereFragmentShader from './shaders/atmosphere/fragment.glsl'
 
-// Access the underlying Three.js scene object
-let scene = aframeScene.object3D;
+// Debug object
+let debugObject = {};
 
-const debugObject = {
-}
-
-// Debug 
+// Debug GUI
 let gui = new GUI({
     width: 300,
     title: "Debug UI",
     closeFolders: true
 });
-// gui.close()
-// gui.hide()
 
 window.addEventListener('keydown', (e) => {
     if (e.key == "h")
-        gui.show(gui._hidden)
-})
+        gui.show(gui._hidden);
+});
 
-// Loader and Models
-let gltfLoader = new GLTFLoader()
-let globe
-let globeTweaks = gui.addFolder("Globe")
+// Get the A-Frame scene element
+let aframeScene = document.querySelector('#myScene');
+// console.log(aframeScene);
 
-// gltfLoader.load(
-//     'https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/3D_Models/earth_globe/scene.gltf',
-//     (gltf) => {
-//         console.log('success')
-//         // console.log(gltf)
+// Access the underlying Three.js scene object
+let scene = aframeScene.object3D;
+scene.castShadow = true;
+scene.shadow = true;
 
-//         globe = gltf.scene.children[0].children[0].children[0].children[0]
-//         globe.position.set(1, 1, -3);
-//         globe.scale.set(0.05, 0.05, 0.05)
+// Get the A-Frame camera element
+let aframeCamera = document.querySelector('#myCamera');
 
-//         globeTweaks
-//             .add(globe.position, 'x')
-//             .min(-3)
-//             .max(3)
-//             .step(0.01)
-//             .name('cube x-pos');
+// Access the underlying Three.js camera object
+let cameraComponent = aframeCamera.components;
+let camera
 
-//         globeTweaks
-//             .add(globe.position, 'y')
-//             .min(1)
-//             .max(3)
-//             .step(0.01)
-//             .name('cube y-pos');
-
-//         globeTweaks
-//             .add(globe.position, 'z')
-//             .min(-3)
-//             .max(3)
-//             .step(0.01)
-//             .name('cube z-pos');
-
-//         debugObject.spin = () => {
-//             gsap.to(globe.rotation, { y: globe.rotation.y + Math.PI * 2 })
-//         }
-
-//         globeTweaks.add(debugObject, 'spin')
-
-//         // Access materials of the loaded GLTF model
-//         globe.traverse((child) => {
-//             if (child.isMesh && child.material.map && child.material.map.normalMap) {
-//                 console.log(child.material); // log the material of each mesh
-//                 let texture = new THREE.TextureLoader().load('assets/' + child.material.map.normalMap);
-//                 let material = new THREE.MeshBasicMaterial({ map: texture });
-//                 child.material = material
-
-//                 globeTweaks
-//                     .add(child.material, 'visible').name(`material id ${child.material.id}`);;
-//             }
-//         });
-
-//         scene.add(globe)
-//     },
-//     (progress) => {
-//         console.log('progress')
-//         // console.log(progress)
-//     },
-//     (error) => {
-//         console.log('error')
-//         // console.log(error)
-//     },
-// )
+// Loaders
+const textureLoader = new THREE.TextureLoader()
 
 /**
- * Object
+ * Earth
  */
-// Cube 
-debugObject.color = "#e00000"
-let cubeGeometry = new THREE.BoxGeometry(1, 1, 1, 2, 2, 2);
-let cubeMaterial = new THREE.MeshBasicMaterial({ color: debugObject.color });
-let cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
-cubeMesh.position.set(-1, 1, -3);
-scene.add(cubeMesh);
+let earthParameters = {}
+earthParameters.atmosphereDayColor = '#00aaff'
+earthParameters.atmosphereTwilightColor = '#ff6600'
 
-// Line
-// let linePoints = []
-// linePoints.push(new THREE.Vector3(-1, 1, 1))
-// linePoints.push(new THREE.Vector3(0, 0, 0))
-// linePoints.push(new THREE.Vector3(1, -1, -1))
-
-// let lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints)
-// let lineMaterial = new THREE.LineBasicMaterial({
-//     color: 0xffffff,
-//     linewidth: 10
-// })
-// let line = new THREE.Line(lineGeometry, lineMaterial)
-// line.position.set(0, 1, -3)
-// scene.add(line)
-
-// Curved Line 
-//Create a closed wavey loop
-debugObject.segments = 20;
-debugObject.points = {
-    point1: { x: 2, y: 7, z: -5 },
-    point2: { x: 0, y: 4, z: -5 },
-    point3: { x: -2, y: 4, z: -5 }
-};
-
-console.log(debugObject.points.point1)
-
-let curve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(debugObject.points.point1.x, debugObject.points.point1.y, debugObject.points.point1.z),
-    new THREE.Vector3(debugObject.points.point2.x, debugObject.points.point2.y, debugObject.points.point2.z),
-    new THREE.Vector3(debugObject.points.point3.x, debugObject.points.point3.y, debugObject.points.point3.z),
-]);
-
-let curvePoints = curve.getPoints(debugObject.segments);
-let curveGeometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
-
-let curveMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
-
-// Create the final object to add to the scene
-let curveObject = new THREE.Line(curveGeometry, curveMaterial);
-scene.add(curveObject)
-
-
-// GUI  
-let cubeTweaks = gui.addFolder("Cube")
-let curveTweaks = gui.addFolder("Curve")
-let pointsPositions = curveTweaks.addFolder("Points")
-let point1 = pointsPositions.addFolder("Point 1")
-let point2 = pointsPositions.addFolder("Point 2")
-let point3 = pointsPositions.addFolder("Point 3")
-
-
-cubeTweaks
-    .add(cubeMesh.position, 'x')
-    .min(-3)
-    .max(3)
-    .step(0.01)
-    .name('cube x-pos');
-
-cubeTweaks
-    .add(cubeMesh.position, 'y')
-    .min(1)
-    .max(3)
-    .step(0.01)
-    .name('cube y-pos');
-
-cubeTweaks
-    .add(cubeMesh.position, 'z')
-    .min(-3)
-    .max(3)
-    .step(0.01)
-    .name('cube z-pos');
-
-cubeTweaks
-    .add(cubeMaterial, 'visible');
-
-cubeTweaks
-    .add(cubeMaterial, 'wireframe');
-
-cubeTweaks
-    .addColor(debugObject, 'color')
+gui
+    .addColor(earthParameters, 'atmosphereDayColor')
     .onChange(() => {
-        cubeMaterial.color.set(debugObject.color)
+        earthMaterial.uniforms.uAtmosphereDayColor.value.set(earthParameters.atmosphereDayColor)
+        atmosphereMaterial.uniforms.uAtmosphereDayColor.value.set(earthParameters.atmosphereDayColor)
     })
 
-
-curveTweaks
-    .add(debugObject, 'segments')
-    .min(2)
-    .max(20)
-    .step(1)
-    .name('curve segments')
-    .onFinishChange((value) => {
-        curvePoints = curve.getPoints(value);
-        curveObject.geometry.dispose();
-        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
+gui
+    .addColor(earthParameters, 'atmosphereTwilightColor')
+    .onChange(() => {
+        earthMaterial.uniforms.uAtmosphereTwilightColor.value.set(earthParameters.atmosphereTwilightColor)
+        atmosphereMaterial.uniforms.uAtmosphereTwilightColor.value.set(earthParameters.atmosphereTwilightColor)
     })
 
-    
-point1
-    .add(debugObject.points.point1, 'x')
-    .min(-10)
-    .max(10)
-    .step(0.1)
-    .onChange((value) => {
-        curve.points[0].x = value
-        curvePoints = curve.getPoints(debugObject.segments);
-        curveObject.geometry.dispose();
-        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
-    })
+// Textures 
+let earthDayTexture = textureLoader.load('./earth/day.jpg')
+earthDayTexture.colorSpace = THREE.SRGBColorSpace
+earthDayTexture.anisotropy = 8
 
-point1
-    .add(debugObject.points.point1, 'y')
-    .min(-10)
-    .max(10)
-    .step(0.1)
-    .onChange((value) => {
-        curve.points[0].y = value
-        curvePoints = curve.getPoints(debugObject.segments);
-        curveObject.geometry.dispose();
-        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
-    })
+let earthNightTexture = textureLoader.load('./earth/night.jpg')
+earthNightTexture.colorSpace = THREE.SRGBColorSpace
+earthNightTexture.anisotropy = 8
 
-point1
-    .add(debugObject.points.point1, 'z')
-    .min(-10)
-    .max(10)
-    .step(0.1)
-    .onChange((value) => {
-        curve.points[0].z = value
-        curvePoints = curve.getPoints(debugObject.segments);
-        curveObject.geometry.dispose();
-        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
-    })
+let earthSpecularCloudsTexture = textureLoader.load('./earth/specularClouds.jpg')
+earthSpecularCloudsTexture.anisotropy = 8
 
-point2
-    .add(debugObject.points.point2, 'x')
-    .min(-10)
-    .max(10)
-    .step(0.1)
-    .onChange((value) => {
-        curve.points[1].x = value
-        curvePoints = curve.getPoints(debugObject.segments);
-        curveObject.geometry.dispose();
-        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
-    })
+// Mesh
+const earthGeometry = new THREE.SphereGeometry(1, 64, 64)
+const earthMaterial = new THREE.ShaderMaterial({
+    vertexShader: earthVertexShader,
+    fragmentShader: earthFragmentShader,
+    uniforms:
+    {
+        uDayTexture: new THREE.Uniform(earthDayTexture),
+        uNightTexture: new THREE.Uniform(earthNightTexture),
+        uSpecularCloudsTexture: new THREE.Uniform(earthSpecularCloudsTexture),
+        uSunDirection: new THREE.Uniform(new THREE.Vector3(0, 0, 1)),
+        uAtmosphereDayColor: new THREE.Uniform(new THREE.Color(earthParameters.atmosphereDayColor)),
+        uAtmosphereTwilightColor: new THREE.Uniform(new THREE.Color(earthParameters.atmosphereTwilightColor)),
+    }
+})
+// let earthMaterial = new THREE.MeshBasicMaterial({color: 'red'})
+const earth = new THREE.Mesh(earthGeometry, earthMaterial)
+// scene.add(earth)
 
-point2
-    .add(debugObject.points.point2, 'y')
-    .min(-10)
-    .max(10)
-    .step(0.1)
-    .onChange((value) => {
-        curve.points[1].y = value
-        curvePoints = curve.getPoints(debugObject.segments);
-        curveObject.geometry.dispose();
-        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
-    })
 
-point2
-    .add(debugObject.points.point2, 'z')
-    .min(-10)
-    .max(10)
-    .step(0.1)
-    .onChange((value) => {
-        curve.points[1].z = value
-        curvePoints = curve.getPoints(debugObject.segments);
-        curveObject.geometry.dispose();
-        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
-    })
+// Atmosphere 
+let atmosphereMaterial = new THREE.ShaderMaterial({
+    vertexShader: atmosphereVertexShader,
+    fragmentShader: atmosphereFragmentShader,
+    uniforms:
+    {
+        uSunDirection: new THREE.Uniform(new THREE.Vector3(0, 0, 1)),
+        uAtmosphereDayColor: new THREE.Uniform(new THREE.Color(earthParameters.atmosphereDayColor)),
+        uAtmosphereTwilightColor: new THREE.Uniform(new THREE.Color(earthParameters.atmosphereTwilightColor)),
+    },
+    side: THREE.BackSide,
+    transparent: true
+});
 
-point2
-    .add(debugObject.points.point2, 'x')
-    .min(-10)
-    .max(10)
-    .step(0.1)
-    .onChange((value) => {
-        curve.points[2].x = value
-        curvePoints = curve.getPoints(debugObject.segments);
-        curveObject.geometry.dispose();
-        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
-    })
+let atmosphere = new THREE.Mesh(earthGeometry, atmosphereMaterial);
+atmosphere.scale.set(1.04, 1.04, 1.04);
+// scene.add(atmosphere)
 
-point2
-    .add(debugObject.points.point2, 'y')
-    .min(-10)
-    .max(10)
-    .step(0.1)
-    .onChange((value) => {
-        curve.points[2].y = value
-        curvePoints = curve.getPoints(debugObject.segments);
-        curveObject.geometry.dispose();
-        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
-    })
+// Sun 
+let sunSpherical = new THREE.Spherical(1, Math.PI * 0.5)
+let sunDirection = new THREE.Vector3()
 
-point2
-    .add(debugObject.points.point2, 'z')
-    .min(-10)
-    .max(10)
-    .step(0.1)
-    .onChange((value) => {
-        curve.points[2].z = value
-        curvePoints = curve.getPoints(debugObject.segments);
-        curveObject.geometry.dispose();
-        curveObject.geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
-    })
+// Debug 
+let debugSun = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(0.1, 2),
+    new THREE.MeshBasicMaterial()
+)
 
-AFRAME.registerComponent('custom-three-js-object', {
+// scene.add(debugSun)
+
+AFRAME.registerComponent('three-js-globe', {
     init: function () {
-        // Create a Three.js mesh
-        let torusGeometry = new THREE.TorusGeometry(0.4, 0.01, 20, 45)
-        let torusMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        let torusMesh = new THREE.Mesh(torusGeometry, torusMaterial);
-        torusMesh.position.set(0, 1, -3);
-        gui.add(torusMesh.position, 'y').min(1).max(3).step(0.01).name('globe y-pos');
-        scene.add(torusMesh);
+        let globeEntity = document.querySelector('#globe');
+        let globeObject3D = globeEntity.object3D;
+        globeObject3D.add(earth, atmosphere, debugSun)
     }
 });
 
-let guiContainer = document.getElementById('guiContainer');
-let guiElement = gui.domElement;
-guiContainer.appendChild(guiElement);
+// Update 
+let updateSun = () => {
+    // Sun direction 
+    sunDirection.setFromSpherical(sunSpherical);
+
+    // Debug 
+    debugSun.position.copy(sunDirection).multiplyScalar(5)
+
+    // Uniforms 
+    earthMaterial.uniforms.uSunDirection.value.copy(sunDirection)
+    atmosphereMaterial.uniforms.uSunDirection.value.copy(sunDirection)
+}
+
+updateSun()
+
+console.log(debugSun.position)
+
+// Tweaks 
+gui
+    .add(sunSpherical, 'phi')
+    .min(0)
+    .max(Math.PI)
+    .onChange(updateSun)
+gui
+    .add(sunSpherical, 'theta')
+    .min(- Math.PI)
+    .max(Math.PI)
+    .onChange(updateSun)
+
+
+// Lights 
+let lightsTweaks = gui.addFolder("Lights")
+
+let ambientLight = new THREE.AmbientLight(0xffffff, .6)
+lightsTweaks.add(ambientLight, 'intensity').min(0).max(3).step(0.001).name("ambientLight intensity")
+scene.add(ambientLight)
+
+// // Point light 
+// let pointLight = new THREE.PointLight(0xffffff, 0.4, 100);
+// pointLight.position.set(1, 2, - 1.5);
+// pointLight.castShadow = true;
+// pointLight.shadow.mapSize.width = 1024
+// pointLight.shadow.mapSize.heightwidth = 1024
+// pointLight.shadow.camera.near = .1
+// pointLight.shadow.camera.far = 3
+
+// let pointSphereGeometry = new THREE.SphereGeometry(0.1, 24, 16);
+// let pointSphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+// let pointSphereMesh = new THREE.Mesh(pointSphereGeometry, pointSphereMaterial);
+// pointSphereMesh.position.set(1, 2, - 1.5);
+
+// lightsTweaks.add(pointLight, 'intensity').min(0).max(3).step(0.001).name("pointLight intensity")
+// lightsTweaks.add(pointLight.position, 'x').min(- 5).max(5).step(0.001).onChange((value) => { pointSphereMesh.position.x = value })
+// lightsTweaks.add(pointLight.position, 'y').min(- 5).max(5).step(0.001).onChange((value) => { pointSphereMesh.position.y = value })
+// lightsTweaks.add(pointLight.position, 'z').min(- 5).max(5).step(0.001).onChange((value) => { pointSphereMesh.position.z = value })
+
+// let sphereSize = 1;
+// let pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);
+// let pointLightCameraHelper = new THREE.CameraHelper(pointLight.shadow.camera)
+// // pointLightHelper.visible = false
+// pointLightCameraHelper.visible = false
+// scene.add(pointLightCameraHelper)
+// scene.add(pointLight, pointSphereMesh, pointLightHelper);
+
+/**
+ * Sizes
+ */
+let sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight
+}
+
+window.addEventListener('resize', () => {
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // // Update camera
+    // camera.aspect = sizes.width / sizes.height
+    // camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+})
+
+// Access the underlying Three.js renderer object
+let renderer
+
+setTimeout(() => {
+    camera = cameraComponent.camera.camera;
+
+    renderer = aframeScene.renderer;
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(sizes.pixelRatio)
+    renderer.setClearColor('#000011')
+}, 100)
+
+/**
+ * Animate
+ */
+let clock = new THREE.Clock()
+
+let tick = () => {
+    let elapsedTime = clock.getElapsedTime()
+
+    earth.rotation.y = elapsedTime * 0.1
+
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
+}
+
+tick()

@@ -46,7 +46,7 @@ let camera
 /**
  * Sizes
  */
-const sizes = {
+let sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 }
@@ -73,7 +73,7 @@ setTimeout(() => {
     camera = cameraComponent.camera.camera;
 
     renderer = aframeScene.renderer;
-    renderer.shadowMap.enabled = true;
+    // renderer.shadowMap.enabled = true;
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -157,11 +157,28 @@ let chaserCovarianceMesh = new THREE.Mesh(chaserCovarianceGeometry, chaserCovari
 chaserCovarianceMesh.position.set(0.7, 1, -1);
 chaserCovarianceMesh.rotation.set(2, 10, -3);
 
+
+// Test 
+let chaserCovarianceGeometryTest = new THREE.SphereGeometry(0.5, 24, 16);
+chaserCovarianceGeometryTest.rotateZ(Math.PI / 2);
+chaserCovarianceGeometryTest.scale(2, 0, 2);
+
+let chaserCovarianceMaterialTest = new THREE.MeshStandardMaterial({
+    color: '#0388fc',
+    // wireframe: true,
+    side: THREE.DoubleSide
+});
+
+let chaserCovarianceMeshTest = new THREE.Mesh(chaserCovarianceGeometryTest, chaserCovarianceMaterialTest);
+chaserCovarianceMeshTest.position.set(0.7, 1, -1.999);
+chaserCovarianceMeshTest.rotation.set(Math.PI * 0.5, 0, 0);
+
 AFRAME.registerComponent('three-js-chaser-covariance', {
     init: function () {
         let chaserCovarianceEntity = document.querySelector('#chaserCovariance');
         let chaserCovarianceObject3D = chaserCovarianceEntity.object3D;
         chaserCovarianceObject3D.add(chaserCovarianceMesh)
+        chaserCovarianceObject3D.add(chaserCovarianceMeshTest)
     }
 });
 
@@ -192,23 +209,6 @@ function checkTwoShapeIntersect(object1, object2) {
 
 // checkTwoShapeIntersect(targetCovarianceObject3D, chaserCovarianceMesh)
 
-
-// AFRAME.registerComponent('three-js-intersection', {
-//     init: function () {
-//         let targetCovarianceEntity = document.querySelector('#targetCovariance');
-//         let targetCovarianceMesh = targetCovarianceEntity.object3D.children[0];
-//         // chaserCovarianceObject3D.position.set(0.7, 1, -1);
-//         console.log(targetCovarianceMesh)
-//         let chaserCovarianceEntity = document.querySelector('#chaserCovariance');
-//         let chaserCovarianceMesh = chaserCovarianceEntity.object3D.children[0];
-//         // chaserCovarianceObject3D.position.set(0.7, 1, -1);
-//         console.log(chaserCovarianceMesh)
-
-//         targetCovarianceMesh.updateMatrix();
-//         // chaserCovarianceMesh.updateMatrix();
-//     }
-// });
-
 targetCovarianceMesh.updateMatrix()
 chaserCovarianceMesh.updateMatrix()
 
@@ -219,7 +219,11 @@ intRes.material = new THREE.MeshBasicMaterial({
 });
 intRes.position.set(-0.7, 1, -1);
 intRes.scale.set(0.999, 0.999, 0.999);
-scene.add(intRes)
+// scene.add(intRes)
+
+let targetCovarianceEntity = document.querySelector('#targetCovariance');
+let targetCovarianceObject3D = targetCovarianceEntity.object3D;
+targetCovarianceObject3D.add(intRes)
 
 //Update the intersection after changes
 function handleIntersectionUpdate(xPos, object) {
@@ -244,7 +248,8 @@ function handleIntersectionUpdate(xPos, object) {
         intRes.position.set(targetCovarianceMesh.position.x, 1, -1);
     }
     intRes.scale.set(0.990, 0.990, 0.999);
-    scene.add(intRes)
+    // scene.add(intRes)
+    targetCovarianceObject3D.add(intRes)
 }
 
 console.log("ole")
@@ -313,13 +318,17 @@ lightsTweaks.add(ambientLight, 'intensity').min(0).max(3).step(0.001).name("ambi
 scene.add(ambientLight)
 
 // Point light 
-const pointLight = new THREE.PointLight(0xffffff, 0.4, 100);
+let pointLight = new THREE.PointLight(0xffffff, 0.4, 100);
 pointLight.position.set(1, 2, - 1.5);
 pointLight.castShadow = true;
+pointLight.shadow.mapSize.width = 1024
+pointLight.shadow.mapSize.heightwidth = 1024
+pointLight.shadow.camera.near = .1
+pointLight.shadow.camera.far = 3
 
-const pointSphereGeometry = new THREE.SphereGeometry(0.1, 24, 16);
-const pointSphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-const pointSphereMesh = new THREE.Mesh(pointSphereGeometry, pointSphereMaterial);
+let pointSphereGeometry = new THREE.SphereGeometry(0.1, 24, 16);
+let pointSphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+let pointSphereMesh = new THREE.Mesh(pointSphereGeometry, pointSphereMaterial);
 pointSphereMesh.position.set(1, 2, - 1.5);
 
 lightsTweaks.add(pointLight, 'intensity').min(0).max(3).step(0.001).name("pointLight intensity")
@@ -327,8 +336,12 @@ lightsTweaks.add(pointLight.position, 'x').min(- 5).max(5).step(0.001).onChange(
 lightsTweaks.add(pointLight.position, 'y').min(- 5).max(5).step(0.001).onChange((value) => { pointSphereMesh.position.y = value })
 lightsTweaks.add(pointLight.position, 'z').min(- 5).max(5).step(0.001).onChange((value) => { pointSphereMesh.position.z = value })
 
-const sphereSize = 1;
-const pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);
+let sphereSize = 1;
+let pointLightHelper = new THREE.PointLightHelper(pointLight, sphereSize);
+let pointLightCameraHelper = new THREE.CameraHelper(pointLight.shadow.camera)
+pointLightHelper.visible = false
+pointLightCameraHelper.visible = false
+scene.add(pointLightCameraHelper)
 scene.add(pointLight, pointSphereMesh, pointLightHelper);
 
 let targetTweaks = gui.addFolder("Target")
@@ -357,10 +370,10 @@ chaserTweaks
 /**
  * Animate
  */
-const clock = new THREE.Clock()
+let clock = new THREE.Clock()
 
-const tick = () => {
-    const elapsedTime = clock.getElapsedTime()
+let tick = () => {
+    let elapsedTime = clock.getElapsedTime()
 
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)

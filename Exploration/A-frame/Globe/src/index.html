@@ -14,28 +14,70 @@
   </head>
   <body>
     <a-scene id="myScene" light="defaultLightsEnabled: false">
-
-      <a-entity
-        id="globe"
-        position="0 1.5 -3"
-        three-js-globe
-      >
-      </a-entity>
+      <a-box
+        id="collisionBox"
+        position="0 1.5 -1.5"
+        opacity="0"
+        grabbable
+        stretchable
+        draggable
+        ><a-entity id="globe" scale="0.7 0.7 0.7" three-js-globe> </a-entity>
+      </a-box>
 
       <a-entity>
         <a-camera id="myCamera" camera wasd-controls look-controls></a-camera>
-        <a-entity
-          sphere-collider="objects: a-box, a-sphere, a-entity#conjunction"
+        <!-- <a-entity
+          sphere-collider="objects: a-box"
           super-hands
           hand-controls="hand: left"
         ></a-entity>
         <a-entity
-          sphere-collider="objects: a-box, a-sphere, a-entity#conjunction"
+          sphere-collider="objects: a-box"
           super-hands
           hand-controls="hand: right"
           laser-controls="hand: right"
+        ></a-entity> -->
+        <a-entity
+          oculus-touch-controls="hand: left"
+          id="leftController"
+          raycaster="showLine: true"
+        ></a-entity>
+        <a-entity
+          oculus-touch-controls="hand: right"
+          id="rightController"
+          raycaster="showLine: true"
         ></a-entity>
       </a-entity>
+
+      <!-- Handle button events -->
+      <a-entity id="buttonHandler">
+        <!-- Left controller -->
+        <a-entity
+          id="leftTrigger"
+          class="controller-button"
+          mixin="button"
+          visible="false"
+          events="
+            triggerdown: #leftController;
+            gripdown: #leftController;
+            trackpaddown: #leftController;
+          "
+        ></a-entity>
+
+        <!-- Right controller -->
+        <a-entity
+          id="rightTrigger"
+          class="controller-button"
+          mixin="button"
+          visible="false"
+          events="
+            triggerdown: #rightController;
+            gripdown: #rightController;
+            trackpaddown: #rightController;
+          "
+        ></a-entity>
+      </a-entity>
+
     </a-scene>
     <script type="module" src="./script.js"></script>
   </body>

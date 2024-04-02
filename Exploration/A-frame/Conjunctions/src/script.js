@@ -247,12 +247,11 @@ function handleIntersectionUpdate(xPos, object) {
     if (object == 1) {
         intRes.position.set(targetCovarianceMesh.position.x, 1, -1);
     }
-    intRes.scale.set(0.990, 0.990, 0.999);
+    intRes.scale.set(0.999, 0.999, 0.999);
     // scene.add(intRes)
     targetCovarianceObject3D.add(intRes)
 }
 
-console.log("ole")
 
 // Walls 
 // Floor 

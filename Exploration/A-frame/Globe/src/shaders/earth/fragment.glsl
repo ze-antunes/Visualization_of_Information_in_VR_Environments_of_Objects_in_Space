@@ -25,7 +25,7 @@ void main() {
 
     // Specular Clouds color
     vec2 specularCloudsColor = texture(uSpecularCloudsTexture, vUv).rg;
-    
+
     // Clouds 
     float cloudMix = smoothstep(0.5, 1.0, specularCloudsColor.g);
     cloudMix *= dayMix;
@@ -42,12 +42,13 @@ void main() {
 
     // Specular
     vec3 reflection = reflect(-uSunDirection, normal);
-    float specular = - dot(reflection, viewDirection);
+    float specular = -dot(reflection, viewDirection);
     specular = max(specular, 0.0);
     specular = pow(specular, 32.0);
     specular *= specularCloudsColor.r;
 
-    vec3 specularColor = mix(vec3(1.0), atmosphereColor, fresnel);
+    //vec3 specularColor = mix(vec3(1.0), atmosphereColor, fresnel);
+    vec3 specularColor = mix(vec3(0.2), atmosphereColor, fresnel);
     color += specular * specularColor;
 
     // Final color

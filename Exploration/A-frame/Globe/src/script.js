@@ -380,29 +380,29 @@ gui
 //     }
 // }
 
-// //Update the intersection after changes
-// function handleIntersectionUpdate() {
-//     // Remove the intRes object from the scene
-//     scene.remove(intRes);
-//     // Dispose of the geometry to free up memory
-//     intRes.geometry.dispose();
-//     // Optionally, dispose of the material as well if it's not used elsewhere
-//     intRes.material.dispose();
-//     // Set intRes to null to remove references
-//     intRes = null;
+//Update the intersection after changes
+function handleIntersectionUpdate() {
+    // Remove the intRes object from the scene
+    scene.remove(intRes);
+    // Dispose of the geometry to free up memory
+    intRes.geometry.dispose();
+    // Optionally, dispose of the material as well if it's not used elsewhere
+    intRes.material.dispose();
+    // Set intRes to null to remove references
+    intRes = null;
 
-//     intRes = CSG.intersect(targetCovarianceMesh, chaserCovarianceMesh);
-//     console.log(intRes);
-//     intRes.material = new THREE.MeshBasicMaterial({
-//         color: 'red',
-//         side: THREE.DoubleSide
-//     });
+    intRes = CSG.intersect(targetCovarianceMesh, chaserCovarianceMesh);
+    console.log(intRes);
+    intRes.material = new THREE.MeshBasicMaterial({
+        color: 'red',
+        side: THREE.DoubleSide
+    });
 
-//     intRes.position.set(targetCovarianceMesh.position.x, 1, -1);
-//     intRes.scale.set(0.999, 0.999, 0.999);
-//     // scene.add(intRes)
-//     targetCovarianceMesh.add(intRes)
-// }
+    intRes.position.set(targetCovarianceMesh.position.x, 1, -1);
+    intRes.scale.set(0.999, 0.999, 0.999);
+    // scene.add(intRes)
+    targetCovarianceMesh.add(intRes)
+}
 
 
 
@@ -471,9 +471,14 @@ let tick = () => {
     // Update chaser
     if (target != undefined) {
         let targetAngle = elapsedTime * .05
-        target.position.x = Math.cos(targetAngle) * 1.4
-        target.position.y = Math.cos(targetAngle) * - .5
-        target.position.z = (Math.sin(targetAngle) * 1.4)
+        let phiAngle = Math.PI * 0.2
+        // target.position.x = Math.cos(targetAngle) * 1.4
+        // target.position.y = Math.cos(targetAngle) * - .5
+        // target.position.z = (Math.sin(targetAngle) * 1.4)
+        target.position.x = Math.sin(phiAngle) * Math.cos(targetAngle) * 1.4
+        target.position.y = Math.sin(phiAngle) * Math.sin(targetAngle) * 1.4
+        target.position.z = (Math.cos(phiAngle) * 1.4)
+
         globeObject3D.add(target)
     }
 

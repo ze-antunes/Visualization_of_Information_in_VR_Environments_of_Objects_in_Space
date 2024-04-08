@@ -19,26 +19,62 @@ let gui = new GUI({
     closeFolders: true
 });
 
+//Controllers 
+let toggleState = true
+let rightHand = document.getElementById("rightController")
+let leftHand = document.getElementById("leftController")
+
 AFRAME.registerComponent('thumbstick-logging', {
     init: function () {
-        this.el.addEventListener('thumbstickmoved', this.logThumbstick);
-        this.el.addEventListener('triggerdown', this.handleTriggerDown);
-    },
-    logThumbstick: function (evt) {
-        if (evt.detail.y > 0.95) { console.log("DOWN"); }
-    },
-    handleTriggerDown: function (evt) {
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
+        this.el.addEventListener('thumbstickmoved', () => {
+            
+        });
+        this.el.addEventListener('triggerdown', () => {
+            
+        });
+        this.el.addEventListener('abuttondown', () => {
+            if (toggleState) {
+                console.log("toggleState: ", toggleState)
+                rightHand.setAttribute("super-hands", '')
+                rightHand.setAttribute("sphere-collider", 'objects: a-box')
+                rightHand.removeAttribute("oculus-touch-controls")
+
+                leftHand.setAttribute("super-hands", '')
+                leftHand.setAttribute("sphere-collider", 'objects: a-box')
+                leftHand.removeAttribute("oculus-touch-controls")
+                console.log("Attributes: ", rightHand.attributes)
+            } else {
+                console.log("toggleState: ", toggleState)
+                rightHand.setAttribute("oculus-touch-controls", 'hand: right')
+                rightHand.removeAttribute("super-hands")
+                rightHand.removeAttribute("sphere-collider")
+
+                leftHand.setAttribute("oculus-touch-controls", 'hand: left')
+                leftHand.removeAttribute("super-hands")
+                leftHand.removeAttribute("sphere-collider")
+                console.log("Attributes: ", rightHand.attributes)
+            }
+            toggleState = !toggleState
+        });
+
     }
 });
-
 
 window.addEventListener('keydown', (e) => {
     if (e.key == "h")
         gui.show(gui._hidden);
+    // if (e.key == "e") {
+    //     if (toggleState) {
+    //         console.log("toggleState: ", toggleState)
+    //         rightHand.setAttribute("data-test", '')
+    //         console.log("Attributes: ", rightHand.attributes)
+    //     } else {
+    //         console.log("toggleState: ",toggleState)
+    //         rightHand.removeAttribute("data-test")
+    //         console.log("Attributes: ",rightHand.attributes)
+    //     }
+    //     toggleState = !toggleState
+    // }
 });
 
 /**
@@ -80,6 +116,31 @@ let camera
 let textureLoader = new THREE.TextureLoader()
 let gltfLoader = new GLTFLoader()
 
+//Objects Parameters
+//Target Parameters
+let targetTweaks = gui.addFolder("Target")
+let targetParameters = {}
+targetParameters.trajectoryGeometry = null
+targetParameters.trajectoryMaterial = null
+targetParameters.trajectoryPoints = null
+targetParameters.trajectoryThetaAngle = Math.PI * 2.4
+targetParameters.trajectoryPhiAngle = Math.PI * 0.4
+targetParameters.trajectoryRadius = 1.5
+targetParameters.color = '#26F7FD'
+targetParameters.velocity = 0.05
+
+//Chaser Parameters
+let chaserTweaks = gui.addFolder("Chaser")
+let chaserParameters = {}
+chaserParameters.trajectoryGeometry = null
+chaserParameters.trajectoryMaterial = null
+chaserParameters.trajectoryPoints = null
+chaserParameters.trajectoryThetaAngle = Math.PI * 2.1
+chaserParameters.trajectoryPhiAngle = Math.PI * 0
+chaserParameters.trajectoryRadius = 1.5
+chaserParameters.color = 'lightgreen'
+chaserParameters.velocity = 0.05
+
 // Models
 let chaser
 gltfLoader.load(
@@ -87,7 +148,7 @@ gltfLoader.load(
     (gltf) => {
         // console.log(gltf.scene.children[0].children[0].children[0].material)
         chaser = gltf.scene.children[0]
-        chaser.children[0].children[0].material = new THREE.MeshBasicMaterial({ color: 'lightgreen' })
+        chaser.children[0].children[0].material = new THREE.MeshBasicMaterial({ color: chaserParameters.color })
         chaser.scale.set(0.005, 0.005, 0.005)
         chaser.add(chaserCovarianceMesh)
     },
@@ -104,9 +165,9 @@ gltfLoader.load(
     'https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/3D_Models/Target/scene.gltf',
     (gltf) => {
         target = gltf.scene.children[0]
-        target.children[0].children[0].children[0].material = new THREE.MeshBasicMaterial({ color: '#26F7FD' })
-        target.children[0].children[1].children[0].material = new THREE.MeshBasicMaterial({ color: '#26F7FD' })
-        target.children[0].children[1].children[1].material = new THREE.MeshBasicMaterial({ color: '#26F7FD' })
+        target.children[0].children[0].children[0].material = new THREE.MeshBasicMaterial({ color: targetParameters.color })
+        target.children[0].children[1].children[0].material = new THREE.MeshBasicMaterial({ color: targetParameters.color })
+        target.children[0].children[1].children[1].material = new THREE.MeshBasicMaterial({ color: targetParameters.color })
         target.scale.set(0.05, 0.05, 0.05)
         target.position.z = 1.4
         target.position.y = 0.1
@@ -121,33 +182,77 @@ gltfLoader.load(
     },
 )
 
-// Trajectories Geometry
+// Trajectories 
 let count = 100
-let trajectoryGeometry = new THREE.BufferGeometry()
 
-let makeTrajectory = (theta, phi, radius) => {
-    console.log(theta, phi, radius)
+
+//Elliptical Trajectories
+// let geometry = null;
+// let material = null;
+// let a = 10; // Semi-major axis
+// let b = 5; // Semi-minor axis
+// let theta = Math.PI * 2.1; // Full angular span (360 degrees)
+
+// let makeEllipticalTrajectory = (geometry, material, count, a, b, theta) => {
+//     // Geometry
+//     geometry = new THREE.BufferGeometry();
+//     let positions = new Float32Array(count * 3);
+
+//     for (let i = 0; i < count; i++) {
+//         let angle = (i / count) * theta;
+//         let x = a * Math.cos(angle);
+//         let y = b * Math.sin(angle);
+//         let z = 0; // For simplicity, assume the trajectory lies in the xy-plane
+
+//         // Calculate the index for the current point
+//         let index = i * 3;
+
+//         // Store the coordinates in the array
+//         positions[index] = x;
+//         positions[index + 1] = y;
+//         positions[index + 2] = z;
+//     }
+
+//     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+//     // Material
+//     material = new THREE.LineDashedMaterial({
+//         color: 'red',
+//         scale: 1,
+//         dashSize: 0.05,
+//         gapSize: 0.05
+//     })
+
+//     // Line
+//     let trajectoryLine = new THREE.Line(geo metry, material);
+//     trajectoryLine.computeLineDistances()
+//     trajectoryLine.scale.set(1, 1, 1)
+
+//     return trajectoryLine;
+// };
+
+// let trajectory = makeEllipticalTrajectory(geometry, material, count, a, b, theta);
+// scene.add(trajectory);
+
+let makeTrajectory = (geometry, material, points, theta, phi, radius, color) => {
+    console.log(geometry, material, points, theta, phi, radius, color)
+
+    // // Destroy trajectory 
+    // if (points != null) {
+    //     geometry.dispose()
+    //     material.dispose()
+    //     scene.remove(points)
+    // }
+
+    // Geometry 
+    geometry = new THREE.BufferGeometry()
     let positions = new Float32Array(count * 3)
 
     for (let i = 0; i < count; i++) {
-        // let angle = (i / count) * Math.PI * 2; // Angle for each point
-        // let radius = 1.4; // Radius of the circle
-
-        // Generate random coordinates between -1 and 1
-        // let x = Math.cos(angle) * radius;
-        // let y = 0;
-        // let z = (Math.sin(angle) * radius) - 0;
-
-        // let targetAngle = (i / count) * Math.PI * 2;
-        // let phiAngle = Math.PI * 0.2
-        let thetaAngle = (i / count) * Math.PI * 2.1;
-
-        // target.position.x = Math.cos(targetAngle) * 1.4
-        // target.position.y = Math.cos(targetAngle) * - .5
-        // target.position.z = (Math.sin(targetAngle) * 1.4)
-        let x = Math.sin(phi) * Math.cos(thetaAngle) * radius
-        let y = Math.sin(phi) * Math.sin(thetaAngle) * radius
-        let z = Math.sin(phi) * Math.sin(thetaAngle) * radius
+        let thetaAngle = (i / count) * theta;
+        let y = Math.sin(thetaAngle) * Math.sin(phi) * radius
+        let x = Math.cos(thetaAngle) * radius
+        let z = Math.sin(thetaAngle) * Math.cos(phi) * radius
 
         // Calculate the index for the current point
         let index = i * 3;
@@ -158,35 +263,154 @@ let makeTrajectory = (theta, phi, radius) => {
         positions[index + 2] = z;
     }
 
-    return positions;
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+
+    // Material
+    material = new THREE.LineDashedMaterial({
+        color,
+        scale: 1,
+        dashSize: 0.05,
+        gapSize: 0.05
+    })
+
+    // Line
+    let trajectoryLine = new THREE.Line(geometry, material);
+    trajectoryLine.computeLineDistances()
+    trajectoryLine.scale.set(1, 1, 1)
+
+    return trajectoryLine
 }
 
-let positionsT = makeTrajectory(1, 2, 1.7);
+targetTweaks
+    .add(targetParameters, 'trajectoryThetaAngle')
+    .min(0)
+    .max(Math.PI * 2)
+    .step(0.1)
+    .name('trajectory theta')
+    .onFinishChange(
+        () => {
+            // Destroy trajectory
+            targetTrajectory.geometry.dispose()
+            targetTrajectory.material.dispose()
+            globeObject3D.remove(targetTrajectory)
 
-trajectoryGeometry.setAttribute(
-    "position",
-    new THREE.BufferAttribute(positionsT, 3)
-)
+            targetTrajectory = makeTrajectory(
+                targetParameters.trajectoryGeometry,
+                targetParameters.trajectoryMaterial,
+                targetParameters.trajectoryPoints,
+                targetParameters.trajectoryThetaAngle,
+                targetParameters.trajectoryPhiAngle,
+                targetParameters.trajectoryRadius,
+                targetParameters.color
+            )
 
-// Line
-let chaserTrajectoryLineMaterial = new THREE.LineDashedMaterial({
-    color: 'lightgreen',
-    scale: 1,
-    dashSize: 0.05,
-    gapSize: 0.05
-})
+            globeObject3D.add(targetTrajectory)
+        }
+    )
 
-// Chaser Trajectory 
-let chaserTrajectoryLine = new THREE.Line(trajectoryGeometry, chaserTrajectoryLineMaterial);
-chaserTrajectoryLine.computeLineDistances()
-chaserTrajectoryLine.scale.set(1, 1, 1)
+targetTweaks
+    .add(targetParameters, 'trajectoryPhiAngle')
+    .min(0)
+    .max(Math.PI * 2)
+    .step(0.1)
+    .name('trajectory phi')
+    .onFinishChange(
+        () => {
+            // Destroy trajectory
+            targetTrajectory.geometry.dispose()
+            targetTrajectory.material.dispose()
+            globeObject3D.remove(targetTrajectory)
+
+            targetTrajectory = makeTrajectory(
+                targetParameters.trajectoryGeometry,
+                targetParameters.trajectoryMaterial,
+                targetParameters.trajectoryPoints,
+                targetParameters.trajectoryThetaAngle,
+                targetParameters.trajectoryPhiAngle,
+                targetParameters.trajectoryRadius,
+                targetParameters.color
+            )
+
+            globeObject3D.add(targetTrajectory)
+        }
+    )
+
+targetTweaks
+    .add(targetParameters, 'velocity')
+    .min(0)
+    .max(2)
+    .step(0.01)
+    .name('velocity')
+
+
+chaserTweaks
+    .add(chaserParameters, 'trajectoryThetaAngle')
+    .min(0)
+    .max(Math.PI * 2)
+    .step(0.1)
+    .name('trajectory theta')
+    .onFinishChange(
+        () => {
+            // Destroy trajectory
+            chaserTrajectory.geometry.dispose()
+            chaserTrajectory.material.dispose()
+            globeObject3D.remove(chaserTrajectory)
+
+            chaserTrajectory = makeTrajectory(
+                chaserParameters.trajectoryGeometry,
+                chaserParameters.trajectoryMaterial,
+                chaserParameters.trajectoryPoints,
+                chaserParameters.trajectoryThetaAngle,
+                chaserParameters.trajectoryPhiAngle,
+                chaserParameters.trajectoryRadius,
+                chaserParameters.color
+            )
+
+            globeObject3D.add(chaserTrajectory)
+        }
+    )
+
+chaserTweaks
+    .add(chaserParameters, 'trajectoryPhiAngle')
+    .min(0)
+    .max(Math.PI * 2)
+    .step(0.1)
+    .name('trajectory phi')
+    .onFinishChange(
+        () => {
+            // Destroy trajectory
+            chaserTrajectory.geometry.dispose()
+            chaserTrajectory.material.dispose()
+            globeObject3D.remove(chaserTrajectory)
+
+            chaserTrajectory = makeTrajectory(
+                chaserParameters.trajectoryGeometry,
+                chaserParameters.trajectoryMaterial,
+                chaserParameters.trajectoryPoints,
+                chaserParameters.trajectoryThetaAngle,
+                chaserParameters.trajectoryPhiAngle,
+                chaserParameters.trajectoryRadius,
+                chaserParameters.color
+            )
+
+            globeObject3D.add(chaserTrajectory)
+        }
+    )
+
+chaserTweaks
+    .add(chaserParameters, 'velocity')
+    .min(0)
+    .max(2)
+    .step(0.01)
+    .name('velocity')
+
 
 let chaserCovarianceGeometry = new THREE.SphereGeometry(0.5, 24, 16);
 chaserCovarianceGeometry.rotateZ(Math.PI / 2);
 chaserCovarianceGeometry.scale(40, 12, 40);
 
 let chaserCovarianceMaterial = new THREE.MeshStandardMaterial({
-    color: 'lightgreen',
+    color: chaserParameters.color,
     transparent: true,
     opacity: 0.2,
     side: THREE.DoubleSide
@@ -196,47 +420,35 @@ let chaserCovarianceMesh = new THREE.Mesh(chaserCovarianceGeometry, chaserCovari
 chaserCovarianceMesh.position.set(0.7, 1, -1);
 chaserCovarianceMesh.rotation.set(2, 10, -3);
 
-// Target Trajectory 
-let targetTrajectoryLineMaterial = new THREE.LineDashedMaterial({
-    color: '#26F7FD',
-    scale: 1,
-    dashSize: 0.05,
-    gapSize: 0.05
-})
-
-let targetTrajectoryLine = new THREE.Line(trajectoryGeometry, targetTrajectoryLineMaterial);
-targetTrajectoryLine.computeLineDistances()
-targetTrajectoryLine.scale.set(1, 1, 1)
-// targetTrajectoryLine.rotation.set(Math.PI * 0.2, Math.PI * -0.7, Math.PI * -0.7)
-
 let targetCovarianceGeometry = new THREE.SphereGeometry(0.5, 24, 16);
 targetCovarianceGeometry.rotateZ(Math.PI / 2);
 targetCovarianceGeometry.scale(4.6, 1.5, 1.2);
 
-let ellipsoids2Material = new THREE.MeshStandardMaterial({
-    color: '#26F7FD',
+let targetCovarianceMaterial = new THREE.MeshStandardMaterial({
+    color: targetParameters.color,
     transparent: true,
     opacity: 0.2,
     side: THREE.DoubleSide
 });
 
-let targetCovarianceMesh = new THREE.Mesh(targetCovarianceGeometry, ellipsoids2Material);
+let targetCovarianceMesh = new THREE.Mesh(targetCovarianceGeometry, targetCovarianceMaterial);
 
 /**
  * Earth
  */
+let earthTweaks = gui.addFolder("Earth")
 let earthParameters = {}
 earthParameters.atmosphereDayColor = '#7ed1fb'
 earthParameters.atmosphereTwilightColor = '#ffbc8f'
 
-gui
+earthTweaks
     .addColor(earthParameters, 'atmosphereDayColor')
     .onChange(() => {
         earthMaterial.uniforms.uAtmosphereDayColor.value.set(earthParameters.atmosphereDayColor)
         atmosphereMaterial.uniforms.uAtmosphereDayColor.value.set(earthParameters.atmosphereDayColor)
     })
 
-gui
+earthTweaks
     .addColor(earthParameters, 'atmosphereTwilightColor')
     .onChange(() => {
         earthMaterial.uniforms.uAtmosphereTwilightColor.value.set(earthParameters.atmosphereTwilightColor)
@@ -306,13 +518,36 @@ let debugSun = new THREE.Mesh(
 // scene.add(debugSun)
 
 let globeObject3D
+let targetTrajectory
+let chaserTrajectory
+
 AFRAME.registerComponent('three-js-globe', {
     init: function () {
         let globeEntity = document.querySelector('#globe');
         globeObject3D = globeEntity.object3D;
-        globeObject3D.add(earth, atmosphere, debugSun, chaserTrajectoryLine, targetTrajectoryLine)
+        targetTrajectory = makeTrajectory(
+            targetParameters.trajectoryGeometry,
+            targetParameters.trajectoryMaterial,
+            targetParameters.trajectoryPoints,
+            targetParameters.trajectoryThetaAngle,
+            targetParameters.trajectoryPhiAngle,
+            targetParameters.trajectoryRadius,
+            targetParameters.color
+        );
+        chaserTrajectory = makeTrajectory(
+            chaserParameters.trajectoryGeometry,
+            chaserParameters.trajectoryMaterial,
+            chaserParameters.trajectoryPoints,
+            chaserParameters.trajectoryThetaAngle,
+            chaserParameters.trajectoryPhiAngle,
+            chaserParameters.trajectoryRadius,
+            chaserParameters.color
+        );
+        globeObject3D.add(earth, atmosphere, debugSun, chaserTrajectory, targetTrajectory)
+        // globeObject3D.add(earth, atmosphere, debugSun, targetTrajectory)
     }
 });
+
 
 // Update 
 let updateSun = () => {
@@ -329,13 +564,12 @@ let updateSun = () => {
 
 updateSun()
 
-// Tweaks 
-gui
+earthTweaks
     .add(sunSpherical, 'phi')
     .min(0)
     .max(Math.PI)
     .onChange(updateSun)
-gui
+earthTweaks
     .add(sunSpherical, 'theta')
     .min(- Math.PI)
     .max(Math.PI)
@@ -456,24 +690,28 @@ let tick = () => {
 
     // Update chaser
     if (chaser != undefined) {
-        let chaserAngle = elapsedTime * .05
-        chaser.position.x = Math.cos(chaserAngle) * 1.4
-        chaser.position.z = (Math.sin(chaserAngle) * 1.4)
+        let thetaAngle = elapsedTime * chaserParameters.velocity
+        chaser.position.x = Math.cos(thetaAngle) * chaserParameters.trajectoryRadius
+        chaser.position.y = Math.sin(thetaAngle) * Math.sin(chaserParameters.trajectoryPhiAngle) * chaserParameters.trajectoryRadius
+        chaser.position.z = Math.sin(thetaAngle) * Math.cos(chaserParameters.trajectoryPhiAngle) * chaserParameters.trajectoryRadius
+
         globeObject3D.add(chaser)
     }
 
     // Update chaser
     if (target != undefined) {
-        let targetAngle = elapsedTime * 0.05
-        let phiAngle = Math.PI * 0.2
-        // target.position.x = Math.cos(targetAngle) * 1.4
-        // target.position.y = Math.cos(targetAngle) * - .5
-        // target.position.z = (Math.sin(targetAngle) * 1.4)
-        target.position.x = Math.sin(phiAngle) * Math.cos(targetAngle) * 1.7
-        target.position.y = Math.sin(phiAngle) * Math.sin(targetAngle) * 1.7
-        target.position.z = Math.sin(phiAngle) * Math.sin(targetAngle) * 1.7
+        let thetaAngle = elapsedTime * targetParameters.velocity
+        target.position.x = Math.cos(thetaAngle) * targetParameters.trajectoryRadius
+        target.position.y = Math.sin(thetaAngle) * Math.sin(targetParameters.trajectoryPhiAngle) * targetParameters.trajectoryRadius
+        target.position.z = Math.sin(thetaAngle) * Math.cos(targetParameters.trajectoryPhiAngle) * targetParameters.trajectoryRadius
 
         globeObject3D.add(target)
+    }
+
+    // Update chaser
+    if (chaserTrajectory != undefined) {
+        // console.log(chaserTrajectory)
+
     }
 
 

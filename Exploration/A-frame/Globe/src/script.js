@@ -19,22 +19,26 @@ let gui = new GUI({
     closeFolders: true
 });
 
-function logEvent(eventName) {
-    console.log(eventName + ' event triggered!');
-    // You can perform any desired action based on the event name here
-}
+AFRAME.registerComponent('thumbstick-logging', {
+    init: function () {
+        this.el.addEventListener('thumbstickmoved', this.logThumbstick);
+        this.el.addEventListener('triggerdown', this.handleTriggerDown);
+    },
+    logThumbstick: function (evt) {
+        if (evt.detail.y > 0.95) { console.log("DOWN"); }
+    },
+    handleTriggerDown: function (evt) {
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+    }
+});
+
+
 window.addEventListener('keydown', (e) => {
     if (e.key == "h")
         gui.show(gui._hidden);
-    // if (e.key == "e") {
-    //     const geometry = new THREE.BoxGeometry(1, 1, 1);
-    //     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    //     const cube = new THREE.Mesh(geometry, material);
-    //     scene.add(cube);
-    // } 
-    // if (e.key == "r") {
-    //     console.log("ola")
-    // }
 });
 
 /**
@@ -76,18 +80,7 @@ let camera
 let textureLoader = new THREE.TextureLoader()
 let gltfLoader = new GLTFLoader()
 
-// Textures 
-let lineTexture = textureLoader.load('/textures/particles/13.png',
-    (success) => {
-        console.log(success)
-    }, () => {
-        console.log("progress")
-    },
-    (error) => {
-        console.log("Error", error)
-    },)
-
-// Models 
+// Models
 let chaser
 gltfLoader.load(
     'https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/3D_Models/Chaser/scene.gltf',
@@ -128,61 +121,63 @@ gltfLoader.load(
     },
 )
 
-// Particles 
-let particlesGeometry = new THREE.BufferGeometry()
+// Trajectories Geometry
 let count = 100
+let trajectoryGeometry = new THREE.BufferGeometry()
 
-let positions = new Float32Array(count * 3)
+let makeTrajectory = (theta, phi, radius) => {
+    console.log(theta, phi, radius)
+    let positions = new Float32Array(count * 3)
 
-for (let i = 0; i < count; i++) {
-    let angle = (i / count) * Math.PI * 2; // Angle for each point
-    let radius = 1.4; // Radius of the circle
+    for (let i = 0; i < count; i++) {
+        // let angle = (i / count) * Math.PI * 2; // Angle for each point
+        // let radius = 1.4; // Radius of the circle
 
-    // Generate random coordinates between -1 and 1
-    let x = Math.cos(angle) * radius;
-    let y = 0;
-    let z = (Math.sin(angle) * radius) - 0;
+        // Generate random coordinates between -1 and 1
+        // let x = Math.cos(angle) * radius;
+        // let y = 0;
+        // let z = (Math.sin(angle) * radius) - 0;
 
-    // Calculate the index for the current point
-    let index = i * 3;
+        // let targetAngle = (i / count) * Math.PI * 2;
+        // let phiAngle = Math.PI * 0.2
+        let thetaAngle = (i / count) * Math.PI * 2.1;
 
-    // Store the coordinates in the array
-    positions[index] = x;
-    positions[index + 1] = y;
-    positions[index + 2] = z;
+        // target.position.x = Math.cos(targetAngle) * 1.4
+        // target.position.y = Math.cos(targetAngle) * - .5
+        // target.position.z = (Math.sin(targetAngle) * 1.4)
+        let x = Math.sin(phi) * Math.cos(thetaAngle) * radius
+        let y = Math.sin(phi) * Math.sin(thetaAngle) * radius
+        let z = Math.sin(phi) * Math.sin(thetaAngle) * radius
+
+        // Calculate the index for the current point
+        let index = i * 3;
+
+        // Store the coordinates in the array
+        positions[index] = x;
+        positions[index + 1] = y;
+        positions[index + 2] = z;
+    }
+
+    return positions;
 }
 
-particlesGeometry.setAttribute(
+let positionsT = makeTrajectory(1, 2, 1.7);
+
+trajectoryGeometry.setAttribute(
     "position",
-    new THREE.BufferAttribute(positions, 3)
+    new THREE.BufferAttribute(positionsT, 3)
 )
 
-
-// let particlesMaterial = new THREE.PointsMaterial({
-//     size: 0.1,
-//     sizeAttenuation: true,
-//     color: 'lightgreen',
-//     depthWrite: false,
-//     transparent: true,
-//     alphaMap: lineTexture,
-//     blending: THREE.AdditiveBlending,
-// })
-
-// Points 
-// let particles = new THREE.Points(particlesGeometry, particlesMaterial)
-// scene.add(particles)
-
 // Line
-// let lineGeometry = new LineGeometry()
-// lineGeometry.setPositions(positions);
 let chaserTrajectoryLineMaterial = new THREE.LineDashedMaterial({
     color: 'lightgreen',
     scale: 1,
     dashSize: 0.05,
     gapSize: 0.05
 })
+
 // Chaser Trajectory 
-let chaserTrajectoryLine = new THREE.Line(particlesGeometry, chaserTrajectoryLineMaterial);
+let chaserTrajectoryLine = new THREE.Line(trajectoryGeometry, chaserTrajectoryLineMaterial);
 chaserTrajectoryLine.computeLineDistances()
 chaserTrajectoryLine.scale.set(1, 1, 1)
 
@@ -209,10 +204,10 @@ let targetTrajectoryLineMaterial = new THREE.LineDashedMaterial({
     gapSize: 0.05
 })
 
-let targetTrajectoryLine = new THREE.Line(particlesGeometry, targetTrajectoryLineMaterial);
+let targetTrajectoryLine = new THREE.Line(trajectoryGeometry, targetTrajectoryLineMaterial);
 targetTrajectoryLine.computeLineDistances()
 targetTrajectoryLine.scale.set(1, 1, 1)
-targetTrajectoryLine.rotation.set(Math.PI * 0.2, Math.PI * -0.7, Math.PI * -0.7)
+// targetTrajectoryLine.rotation.set(Math.PI * 0.2, Math.PI * -0.7, Math.PI * -0.7)
 
 let targetCovarianceGeometry = new THREE.SphereGeometry(0.5, 24, 16);
 targetCovarianceGeometry.rotateZ(Math.PI / 2);
@@ -405,7 +400,6 @@ function handleIntersectionUpdate() {
 }
 
 
-
 // Lights 
 let lightsTweaks = gui.addFolder("Lights")
 
@@ -470,14 +464,14 @@ let tick = () => {
 
     // Update chaser
     if (target != undefined) {
-        let targetAngle = elapsedTime * .05
+        let targetAngle = elapsedTime * 0.05
         let phiAngle = Math.PI * 0.2
         // target.position.x = Math.cos(targetAngle) * 1.4
         // target.position.y = Math.cos(targetAngle) * - .5
         // target.position.z = (Math.sin(targetAngle) * 1.4)
-        target.position.x = Math.sin(phiAngle) * Math.cos(targetAngle) * 1.4
-        target.position.y = Math.sin(phiAngle) * Math.sin(targetAngle) * 1.4
-        target.position.z = (Math.cos(phiAngle) * 1.4)
+        target.position.x = Math.sin(phiAngle) * Math.cos(targetAngle) * 1.7
+        target.position.y = Math.sin(phiAngle) * Math.sin(targetAngle) * 1.7
+        target.position.z = Math.sin(phiAngle) * Math.sin(targetAngle) * 1.7
 
         globeObject3D.add(target)
     }

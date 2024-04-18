@@ -24,6 +24,17 @@
         ><a-entity id="globe" scale="0.7 0.7 0.7" three-js-globe> </a-entity>
       </a-box>
 
+      <!-- <a-mixin
+        id="box"
+        geometry="primitive: box"
+        material="color: #FAFAFA"
+        rotation="0 0 -35"
+        scale="0.5 0.5 0.5"
+        intersect-color-change
+        shadow="cast: true; receive: false"
+      ></a-mixin>
+      <a-entity boxes></a-entity> -->
+
       <a-entity>
         <a-camera id="myCamera" camera wasd-controls look-controls></a-camera>
 
@@ -41,7 +52,7 @@
         ></a-entity> -->
 
         <!-- Oculus Quest Controllers  -->
-        <a-entity
+        <!-- <a-entity
           oculus-touch-controls="hand: left"
           laser-controls="hand: left"
           id="leftController"
@@ -51,6 +62,18 @@
           id="rightController"
           laser-controls="hand: right"
           thumbstick-logging
+        ></a-entity> -->
+
+        <a-entity
+          id="leftHand"
+          laser-controls="hand: left"
+          raycaster="objects: [mixin='box']"
+        ></a-entity>
+        <a-entity
+          id="rightHand"
+          laser-controls="hand: right"
+          raycaster="objects: [mixin='box']"
+          line="color: #118A7E"
         ></a-entity>
 
         <!-- Hands  -->

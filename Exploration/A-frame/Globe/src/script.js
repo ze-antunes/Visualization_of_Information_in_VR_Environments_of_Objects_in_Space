@@ -26,33 +26,33 @@ let leftHand = document.getElementById("leftController")
 
 AFRAME.registerComponent('thumbstick-logging', {
     init: function () {
-        this.el.addEventListener('thumbstickmoved', () => {
-            
-        });
-        this.el.addEventListener('triggerdown', () => {
-            
-        });
+        // this.el.addEventListener('thumbstickmoved', () => {
+
+        // });
+        // this.el.addEventListener('triggerdown', () => {
+
+        // });
         this.el.addEventListener('abuttondown', () => {
             if (toggleState) {
                 console.log("toggleState: ", toggleState)
-                rightHand.setAttribute("super-hands", '')
-                rightHand.setAttribute("sphere-collider", 'objects: a-box')
-                rightHand.removeAttribute("oculus-touch-controls")
+                // rightHand.setAttribute("super-hands", '')
+                // rightHand.setAttribute("sphere-collider", 'objects: a-box')
+                // rightHand.removeAttribute("oculus-touch-controls")
 
-                leftHand.setAttribute("super-hands", '')
-                leftHand.setAttribute("sphere-collider", 'objects: a-box')
-                leftHand.removeAttribute("oculus-touch-controls")
-                console.log("Attributes: ", rightHand.attributes)
+                // leftHand.setAttribute("super-hands", '')
+                // leftHand.setAttribute("sphere-collider", 'objects: a-box')
+                // leftHand.removeAttribute("oculus-touch-controls")
+                // console.log("Attributes: ", rightHand.attributes)
             } else {
                 console.log("toggleState: ", toggleState)
-                rightHand.setAttribute("oculus-touch-controls", 'hand: right')
-                rightHand.removeAttribute("super-hands")
-                rightHand.removeAttribute("sphere-collider")
+                // rightHand.setAttribute("oculus-touch-controls", 'hand: right')
+                // rightHand.removeAttribute("super-hands")
+                // rightHand.removeAttribute("sphere-collider")
 
-                leftHand.setAttribute("oculus-touch-controls", 'hand: left')
-                leftHand.removeAttribute("super-hands")
-                leftHand.removeAttribute("sphere-collider")
-                console.log("Attributes: ", rightHand.attributes)
+                // leftHand.setAttribute("oculus-touch-controls", 'hand: left')
+                // leftHand.removeAttribute("super-hands")
+                // leftHand.removeAttribute("sphere-collider")
+                // console.log("Attributes: ", rightHand.attributes)
             }
             toggleState = !toggleState
         });
@@ -115,6 +115,157 @@ let camera
 // Loaders
 let textureLoader = new THREE.TextureLoader()
 let gltfLoader = new GLTFLoader()
+
+
+//Load Conjunction Data
+let targetStateVector
+let chaserStateVector
+let scaledTargetPosition
+let scaledChaserPosition
+let targetPosition
+let chaserPosition
+let targetVelocity
+let chaserVelocity
+let targetOrientation
+let chaserOrientation
+let targetColor
+let chaserColor
+let targetSpaceObject
+let chaserSpaceObject
+
+fetch("https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/exp_conjunctions.json")
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        data.conjucntions.forEach(conjunction => {
+            // Information about the target and chaser space objects
+            let target = conjunction.target;
+            let chaser = conjunction.chaser;
+
+            // State vectors for target and chaser
+            targetStateVector = conjunction.details.target.state_vector;
+            chaserStateVector = conjunction.details.chaser.state_vector;
+
+            // Create position vectors for target and chaser
+            // targetPosition = new THREE.Vector3(targetStateVector.x, targetStateVector.y, targetStateVector.z);
+            // chaserPosition = new THREE.Vector3(chaserStateVector.x, chaserStateVector.y, chaserStateVector.z);
+
+            // console.log(targetStateVector.x, targetStateVector.y, targetStateVector.z)
+            // console.log(chaserStateVector.x, chaserStateVector.y, chaserStateVector.z)
+
+            let a = targetStateVector.x - chaserStateVector.x;
+            let b = targetStateVector.y - chaserStateVector.y;
+            let c = targetStateVector.z - chaserStateVector.z;
+
+            let distance = Math.sqrt(a * a + b * b + c * c);
+
+            console.log("distance: ", distance)
+
+            // Scale the positions to fit the 1x1 meter Earth model
+            scaledTargetPosition = scaleCoordinatesToModel([targetStateVector])[0];
+            scaledChaserPosition = scaleCoordinatesToModel([chaserStateVector])[0];
+
+            // Create THREE.Vector3 instances from the scaled coordinates
+            targetPosition = new THREE.Vector3(scaledTargetPosition.x, scaledTargetPosition.y, scaledTargetPosition.z);
+            chaserPosition = new THREE.Vector3(scaledChaserPosition.x, scaledChaserPosition.y, scaledChaserPosition.z);
+            // targetPosition = new THREE.Vector3(targetStateVector.x * 0.00001, targetStateVector.y * 0.000001, targetStateVector.z * 0.000001);
+            // chaserPosition = new THREE.Vector3(chaserStateVector.x * 0.00001, chaserStateVector.y * 0.000001, chaserStateVector.z * 0.000001);
+
+            // console.log(targetPosition)
+            // console.log(chaserPosition)
+
+            // Create velocity vectors for target and chaser
+            targetVelocity = new THREE.Vector3(targetStateVector.x_dot, targetStateVector.y_dot, targetStateVector.z_dot);
+            chaserVelocity = new THREE.Vector3(chaserStateVector.x_dot, chaserStateVector.y_dot, chaserStateVector.z_dot);
+            // targetVelocity = new THREE.Vector3(0,0,0);
+            // chaserVelocity = new THREE.Vector3(0,0,0);
+
+            // Create orientation (Euler angles) for target and chaser (assuming zero rotation)
+            targetOrientation = new THREE.Euler(0, 0, 0, 'XYZ');
+            chaserOrientation = new THREE.Euler(0, 0, 0.3, 'XYZ');
+            // console.log(targetOrientation)
+            // console.log(chaserOrientation)
+
+            // Define color for target and chaser
+            targetColor = 'red'
+            chaserColor = 'green'
+
+            // // Generate space objects for target and chaser
+            // targetSpaceObject = generateSpaceObject(targetPosition, targetVelocity, targetOrientation, targetColor);
+            // chaserSpaceObject = generateSpaceObject(chaserPosition, chaserVelocity, chaserOrientation, chaserColor);
+
+            // scene.add(targetSpaceObject.spaceObject)
+
+            // Store the generated space objects for further manipulation
+            // let targetSpaceObjects = [];
+            // let chaserSpaceObjects = [];
+            // targetSpaceObjects.push(targetSpaceObject);
+            // chaserSpaceObjects.push(chaserSpaceObject);
+        });
+
+    })
+    .catch(error => {
+        // Handle any errors that occurred during the fetch
+        console.error('There was a problem with the fetch operation:', error);
+    });
+
+
+function generateSpaceObject(position, velocity, orientation, color) {
+    // console.log(position, velocity, orientation, color)
+    // Create the space object's geometry
+    let geometry = new THREE.SphereGeometry(0.01, 10, 8);
+
+    // Create the space object's material
+    let material = new THREE.MeshBasicMaterial({ color });
+
+    // Create the space object's mesh
+    let spaceObject = new THREE.Mesh(geometry, material);
+
+    // Set the initial position of the space object
+    spaceObject.position.set(position.x, position.y, position.z);
+
+    // Set the initial orientation of the space object (Euler angles)
+    spaceObject.rotation.set(orientation._x, orientation._y, orientation._z);
+
+    // Add the space object to the scene
+    // scene.add(spaceObject);
+    globeObject3D.add(spaceObject);
+
+    // Update function to animate the space object
+    function updateSpaceObject() {
+        // Update position based on velocity (assuming constant velocity)
+        spaceObject.position.x += velocity.vx;
+        spaceObject.position.y += velocity.vy;
+        spaceObject.position.z += velocity.vz;
+
+        // Update orientation (Euler angles)
+        spaceObject.rotation.x = orientation._x;
+        spaceObject.rotation.y = orientation._y;
+        spaceObject.rotation.z = orientation._z;
+    }
+
+    // Return the space object and the update function
+    return { spaceObject, updateSpaceObject };
+}
+
+function scaleCoordinatesToModel(positions) {
+    // Define scaling factor based on real-life dimensions
+    const realLifeDimension = 12742000; 
+    const modelDimension = 2;
+    const scalingFactor = modelDimension / realLifeDimension;
+
+    // Scale and convert positions
+    let scaledPositions = positions.map(position => {
+        return {
+            x: position.x * scalingFactor,
+            y: position.y * scalingFactor,
+            z: position.z * scalingFactor
+        };
+    });
+
+    return scaledPositions;
+}
+
 
 //Objects Parameters
 //Target Parameters
@@ -186,53 +337,55 @@ gltfLoader.load(
 let count = 100
 
 
+// EME2000 Trajectories
+
 //Elliptical Trajectories
-// let geometry = null;
-// let material = null;
-// let a = 10; // Semi-major axis
-// let b = 5; // Semi-minor axis
-// let theta = Math.PI * 2.1; // Full angular span (360 degrees)
+let geometry = null;
+let material = null;
+let a = 10; // Semi-major axis
+let b = 5; // Semi-minor axis
+let theta = Math.PI * 2.1; // Full angular span (360 degrees)
 
-// let makeEllipticalTrajectory = (geometry, material, count, a, b, theta) => {
-//     // Geometry
-//     geometry = new THREE.BufferGeometry();
-//     let positions = new Float32Array(count * 3);
+let makeEllipticalTrajectory = (geometry, material, count, a, b, theta) => {
+    // Geometry
+    geometry = new THREE.BufferGeometry();
+    let positions = new Float32Array(count * 3);
 
-//     for (let i = 0; i < count; i++) {
-//         let angle = (i / count) * theta;
-//         let x = a * Math.cos(angle);
-//         let y = b * Math.sin(angle);
-//         let z = 0; // For simplicity, assume the trajectory lies in the xy-plane
+    for (let i = 0; i < count; i++) {
+        let angle = (i / count) * theta;
+        let x = a * Math.cos(angle);
+        let y = b * Math.sin(angle);
+        let z = 0; // For simplicity, assume the trajectory lies in the xy-plane
 
-//         // Calculate the index for the current point
-//         let index = i * 3;
+        // Calculate the index for the current point
+        let index = i * 3;
 
-//         // Store the coordinates in the array
-//         positions[index] = x;
-//         positions[index + 1] = y;
-//         positions[index + 2] = z;
-//     }
+        // Store the coordinates in the array
+        positions[index] = x;
+        positions[index + 1] = y;
+        positions[index + 2] = z;
+    }
 
-//     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-//     // Material
-//     material = new THREE.LineDashedMaterial({
-//         color: 'red',
-//         scale: 1,
-//         dashSize: 0.05,
-//         gapSize: 0.05
-//     })
+    // Material
+    material = new THREE.LineDashedMaterial({
+        color: 'red',
+        scale: 1,
+        dashSize: 0.05,
+        gapSize: 0.05
+    })
 
-//     // Line
-//     let trajectoryLine = new THREE.Line(geo metry, material);
-//     trajectoryLine.computeLineDistances()
-//     trajectoryLine.scale.set(1, 1, 1)
+    // Line
+    let trajectoryLine = new THREE.Line(geometry, material);
+    trajectoryLine.computeLineDistances()
+    trajectoryLine.scale.set(1, 1, 1)
 
-//     return trajectoryLine;
-// };
+    return trajectoryLine;
+};
 
-// let trajectory = makeEllipticalTrajectory(geometry, material, count, a, b, theta);
-// scene.add(trajectory);
+let trajectory = makeEllipticalTrajectory(geometry, material, count, a, b, theta);
+scene.add(trajectory);
 
 let makeTrajectory = (geometry, material, points, theta, phi, radius, color) => {
     console.log(geometry, material, points, theta, phi, radius, color)
@@ -506,7 +659,7 @@ atmosphere.scale.set(1.04, 1.04, 1.04);
 // scene.add(atmosphere)
 
 // Sun 
-let sunSpherical = new THREE.Spherical(1, Math.PI * 0.5, -1.4)
+let sunSpherical = new THREE.Spherical(1, Math.PI * 0.5, -1.4) 
 let sunDirection = new THREE.Vector3()
 
 // Debug 
@@ -543,7 +696,8 @@ AFRAME.registerComponent('three-js-globe', {
             chaserParameters.trajectoryRadius,
             chaserParameters.color
         );
-        globeObject3D.add(earth, atmosphere, debugSun, chaserTrajectory, targetTrajectory)
+        globeObject3D.add(earth, atmosphere, chaserTrajectory, targetTrajectory)
+        // globeObject3D.add(earth, atmosphere, debugSun, chaserTrajectory, targetTrajectory)
         // globeObject3D.add(earth, atmosphere, debugSun, targetTrajectory)
     }
 });
@@ -678,7 +832,13 @@ setTimeout(() => {
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(sizes.pixelRatio)
     renderer.setClearColor('#000011')
-}, 100)
+
+    // Generate space objects for target and chaser
+    console.log(targetPosition, targetVelocity, targetOrientation, targetColor)
+    targetSpaceObject = generateSpaceObject(targetPosition, targetVelocity, targetOrientation, targetColor);
+    chaserSpaceObject = generateSpaceObject(chaserPosition, chaserVelocity, chaserOrientation, chaserColor);
+
+}, 1000)
 
 /**
  * Animate
@@ -706,12 +866,6 @@ let tick = () => {
         target.position.z = Math.sin(thetaAngle) * Math.cos(targetParameters.trajectoryPhiAngle) * targetParameters.trajectoryRadius
 
         globeObject3D.add(target)
-    }
-
-    // Update chaser
-    if (chaserTrajectory != undefined) {
-        // console.log(chaserTrajectory)
-
     }
 
 

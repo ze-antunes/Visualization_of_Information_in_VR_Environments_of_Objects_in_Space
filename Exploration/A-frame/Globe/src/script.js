@@ -3,12 +3,30 @@ import GUI from 'lil-gui';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { CSG } from 'three-csg-ts';
 import ThreeMeshUI from 'three-mesh-ui'
+import VRControl from './utils/VRControl';
+
+let vrControl = VRControl
 
 // Import Shaders 
 import earthVertexShader from './shaders/earth/vertex.glsl'
 import earthFragmentShader from './shaders/earth/fragment.glsl'
 import atmosphereVertexShader from './shaders/atmosphere/vertex.glsl'
 import atmosphereFragmentShader from './shaders/atmosphere/fragment.glsl'
+
+
+fetch("https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/exp_conjunctions.json")
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        data.conjucntions.forEach(conjunction => {
+            console.log(conjunction);
+        });
+
+    })
+    .catch(error => {
+        // Handle any errors that occurred during the fetch
+        console.error('There was a problem with the fetch operation:', error);
+    });
 
 // Debug object
 let debugObject = {};
@@ -20,46 +38,48 @@ let gui = new GUI({
     closeFolders: true
 });
 
+gui.hide()
+
 //Controllers 
 let toggleState = true
 let rightHand = document.getElementById("rightController")
 let leftHand = document.getElementById("leftController")
 
-AFRAME.registerComponent('thumbstick-logging', {
-    init: function () {
-        this.el.addEventListener('thumbstickmoved', () => {
+// AFRAME.registerComponent('thumbstick-logging', {
+//     init: function () {
+//         this.el.addEventListener('thumbstickmoved', () => {
 
-        });
-        this.el.addEventListener('triggerdown', () => {
+//         });
+//         this.el.addEventListener('triggerdown', () => {
 
-        });
-        this.el.addEventListener('abuttondown', () => {
-            if (toggleState) {
-                console.log("toggleState: ", toggleState)
-                rightHand.setAttribute("super-hands", '')
-                rightHand.setAttribute("sphere-collider", 'objects: a-box')
-                rightHand.removeAttribute("oculus-touch-controls")
+//         });
+//         this.el.addEventListener('abuttondown', () => {
+//             if (toggleState) {
+//                 console.log("toggleState: ", toggleState)
+//                 rightHand.setAttribute("super-hands", '')
+//                 rightHand.setAttribute("sphere-collider", 'objects: a-box')
+//                 rightHand.removeAttribute("oculus-touch-controls")
 
-                leftHand.setAttribute("super-hands", '')
-                leftHand.setAttribute("sphere-collider", 'objects: a-box')
-                leftHand.removeAttribute("oculus-touch-controls")
-                console.log("Attributes: ", rightHand.attributes)
-            } else {
-                console.log("toggleState: ", toggleState)
-                rightHand.setAttribute("oculus-touch-controls", 'hand: right')
-                rightHand.removeAttribute("super-hands")
-                rightHand.removeAttribute("sphere-collider")
+//                 leftHand.setAttribute("super-hands", '')
+//                 leftHand.setAttribute("sphere-collider", 'objects: a-box')
+//                 leftHand.removeAttribute("oculus-touch-controls")
+//                 console.log("Attributes: ", rightHand.attributes)
+//             } else {
+//                 console.log("toggleState: ", toggleState)
+//                 rightHand.setAttribute("oculus-touch-controls", 'hand: right')
+//                 rightHand.removeAttribute("super-hands")
+//                 rightHand.removeAttribute("sphere-collider")
 
-                leftHand.setAttribute("oculus-touch-controls", 'hand: left')
-                leftHand.removeAttribute("super-hands")
-                leftHand.removeAttribute("sphere-collider")
-                console.log("Attributes: ", rightHand.attributes)
-            }
-            toggleState = !toggleState
-        });
+//                 leftHand.setAttribute("oculus-touch-controls", 'hand: left')
+//                 leftHand.removeAttribute("super-hands")
+//                 leftHand.removeAttribute("sphere-collider")
+//                 console.log("Attributes: ", rightHand.attributes)
+//             }
+//             toggleState = !toggleState
+//         });
 
-    }
-});
+//     }
+// });
 
 window.addEventListener('keydown', (e) => {
     if (e.key == "h")
@@ -679,6 +699,34 @@ setTimeout(() => {
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(sizes.pixelRatio)
     renderer.setClearColor('#000011')
+
+    ////////////////
+    // Controllers
+    ////////////////
+    vrControl = vrControl(renderer, camera, scene);
+
+    scene.add(vrControl.controllerGrips[0], vrControl.controllers[0]);
+
+    vrControl.controllers[0].addEventListener('selectstart', () => {
+
+        selectState = true;
+
+    });
+    vrControl.controllers[0].addEventListener('selectend', () => {
+
+        selectState = false;
+
+    });
+
+    // Get the A-Frame entity representing the laser controls
+    let laserControlsEntity = document.getElementById('rightController')
+    console.log(laserControlsEntity)
+    // Access the raycaster component
+    let raycasterComponent = laserControlsEntity.components.raycaster
+    console.log(raycasterComponent.raycaster)
+    console.log(raycaster)
+
+    raycaster = raycasterComponent.raycaster;
 }, 100)
 
 /**
@@ -745,7 +793,7 @@ let tick = () => {
 
 // function makeTextPanel() {
 
-//     const container = new ThreeMeshUI.Block({
+//     let container = new ThreeMeshUI.Block({
 //         width: 1.2,
 //         height: 0.5,
 //         padding: 0.05,
@@ -775,17 +823,21 @@ let tick = () => {
 
 import FontJSON from './assets/Roboto-msdf.json';
 import FontImage from './assets/Roboto-msdf.png';
+import GlobeViewIcon from "./assets/images/UI/globe_view_icon.png";
+import RoomViewIcon from "./assets/images/UI/room_view_icon.png";
+import LeftArrowIcon from "./assets/images/UI/left_arrow_icon.png";
+import RightArrowIcon from "./assets/images/UI/right_arrow_icon.png";
 
 let meshContainer, meshes, currentMesh;
-const objsToTest = [];
+let objsToTest = [];
 
 // compute mouse position in normalized device coordinates
 // (-1 to +1) for both directions.
 // Used to raycasting against the interactive elements
 
-const raycaster = new THREE.Raycaster();
+let raycaster = new THREE.Raycaster();
 
-const mouse = new THREE.Vector2();
+let mouse = new THREE.Vector2();
 mouse.x = mouse.y = null;
 
 let selectState = false;
@@ -817,25 +869,26 @@ window.addEventListener('touchend', () => {
 
 //
 
+
+
 ////////////////////
 // Primitive Meshes
 ////////////////////
 
 meshContainer = new THREE.Group();
-meshContainer.position.set(0, 1, -1.9);
 scene.add(meshContainer);
 
-const sphere = new THREE.Mesh(
+let sphere = new THREE.Mesh(
     new THREE.IcosahedronGeometry(0.3, 1),
     new THREE.MeshStandardMaterial({ color: 0x3de364, flatShading: true })
 );
 
-const box = new THREE.Mesh(
+let box = new THREE.Mesh(
     new THREE.BoxGeometry(0.45, 0.45, 0.45),
     new THREE.MeshStandardMaterial({ color: 0x643de3, flatShading: true })
 );
 
-const cone = new THREE.Mesh(
+let cone = new THREE.Mesh(
     new THREE.ConeGeometry(0.28, 0.5, 10),
     new THREE.MeshStandardMaterial({ color: 0xe33d4e, flatShading: true })
 );
@@ -844,7 +897,7 @@ const cone = new THREE.Mesh(
 
 sphere.visible = box.visible = cone.visible = false;
 
-meshContainer.position.set(0, 1.5, 1);
+meshContainer.position.set(-1.4, 2, -1.5);
 meshContainer.add(sphere, box, cone);
 
 meshes = [sphere, box, cone];
@@ -880,80 +933,171 @@ function makePanel() {
     // We don't define width and height, it will be set automatically from the children's dimensions
     // Note that we set contentDirection: "row-reverse", in order to orient the buttons horizontally
 
-    const container = new ThreeMeshUI.Block({
+    let container = new ThreeMeshUI.Block({
+        backgroundColor: new THREE.Color("#121212"),
         justifyContent: 'center',
-        contentDirection: 'row-reverse',
         fontFamily: FontJSON,
         fontTexture: FontImage,
         fontSize: 0.07,
         padding: 0.02,
-        borderRadius: 0.11
+        borderRadius: 0.11,
+        backgroundOpacity: 1
     });
 
-    container.position.set(0, 0.6, 1.2);
+    container.position.set(-1.4, 0.6, -1.2);
     container.rotation.x = -0.55;
+
     scene.add(container);
 
+    // HEADER
+
+    let header = new ThreeMeshUI.Block({
+        width: 1.2,
+        height: 0.15,
+        justifyContent: 'center',
+        contentDirection: 'row',
+        margin: 0.02,
+        borderRadius: 0,
+        backgroundOpacity: 0
+    });
+
+    // // Title 
+
+    let title = new ThreeMeshUI.Block({
+        width: 0.8,
+        height: 0.15,
+        justifyContent: 'center',
+        fontSize: 0.1,
+        backgroundOpacity: 0
+    });
+
+    title.add(
+        new ThreeMeshUI.Text({ content: 'Conjunctions' })
+    );
+
+    // // Options
+
+    let options = new ThreeMeshUI.Block({
+        width: 0.5,
+        height: 0.15,
+        justifyContent: 'center',
+        margin: 0.02,
+        backgroundOpacity: 0
+    });
+
+    options.add(
+        new ThreeMeshUI.Text({ content: 'options' })
+    );
+
+    header.add(title, options);
+
+    // MAIN
+
+    let main = new ThreeMeshUI.Block({
+        width: 1,
+        justifyContent: 'center',
+        margin: 0.02,
+        backgroundOpacity: 0
+    });
+
+    // // Cards
+    let cards = new ThreeMeshUI.Block({
+        width: 1,
+        height: 0.15,
+        justifyContent: 'center',
+        margin: 0.02,
+        backgroundOpacity: 0
+    });
+
+    let card = new ThreeMeshUI.Block({
+        width: 1,
+        height: 0.15,
+        justifyContent: 'center',
+        contentDirection: 'row-reverse',
+        margin: 0.02,
+        backgroundOpacity: 0
+    });
+
+    card.add(
+        new ThreeMeshUI.Text({ content: 'Card' })
+    );
+
+    cards.add(card)
+
     // BUTTONS
+
+    let buttons = new ThreeMeshUI.Block({
+        width: 1,
+        height: 0.15,
+        justifyContent: 'center',
+        contentDirection: 'row-reverse',
+        margin: 0.02,
+        backgroundOpacity: 0
+    });
 
     // We start by creating objects containing options that we will use with the two buttons,
     // in order to write less code.
 
-    const buttonOptions = {
-        width: 0.4,
-        height: 0.15,
+    let buttonOptions = {
+        width: 0.3,
+        height: 0.3,
         justifyContent: 'center',
-        offset: 0.05,
         margin: 0.02,
         borderRadius: 0.075
+    };
+
+    let pagesOptions = {
+        width: 0.4,
+        height: 0.4,
+        justifyContent: 'center',
+        backgroundOpacity: 0
     };
 
     // Options for component.setupState().
     // It must contain a 'state' parameter, which you will refer to with component.setState( 'name-of-the-state' ).
 
-    const hoveredStateAttributes = {
+    let hoveredStateAttributes = {
         state: 'hovered',
         attributes: {
             offset: 0.035,
-            backgroundColor: new THREE.Color(0x999999),
+            backgroundColor: new THREE.Color("#FFFFFF"),
             backgroundOpacity: 1,
             fontColor: new THREE.Color(0xffffff)
         },
     };
 
-    const idleStateAttributes = {
+    let idleStateAttributes = {
         state: 'idle',
         attributes: {
             offset: 0.035,
-            backgroundColor: new THREE.Color(0x666666),
-            backgroundOpacity: 0.3,
-            fontColor: new THREE.Color(0xffffff)
+            backgroundColor: new THREE.Color("#929292"),
+            backgroundOpacity: 1,
+            fontColor: new THREE.Color(0xffffff),
+            borderWidth: 0
         },
     };
 
     // Buttons creation, with the options objects passed in parameters.
 
-    const buttonNext = new ThreeMeshUI.Block(buttonOptions);
-    const buttonPrevious = new ThreeMeshUI.Block(buttonOptions);
+    let buttonNext = new ThreeMeshUI.Block(buttonOptions);
+    let pages = new ThreeMeshUI.Block(pagesOptions);
+    let buttonPrevious = new ThreeMeshUI.Block(buttonOptions);
 
-    // Add text to buttons
-
-    buttonNext.add(
-        new ThreeMeshUI.Text({ content: 'next' })
-    );
-
-    buttonPrevious.add(
-        new ThreeMeshUI.Text({ content: 'previous' })
+    pages.add(
+        new ThreeMeshUI.Text({ content: '1 - 4 of 817' })
     );
 
     // Create states for the buttons.
     // In the loop, we will call component.setState( 'state-name' ) when mouse hover or click
 
-    const selectedAttributes = {
+    let selectedAttributes = {
         offset: 0.02,
-        backgroundColor: new THREE.Color(0x777777),
-        fontColor: new THREE.Color(0x222222)
+        backgroundColor: new THREE.Color("#FFBE0B"),
+        fontColor: new THREE.Color(0x222222),
     };
+    // borderWidth: 0.005,
+    // borderColor: new THREE.Color("#FFBE0B"),
+    // borderOpacity: 1
 
     buttonNext.setupState({
         state: 'selected',
@@ -984,18 +1128,105 @@ function makePanel() {
     buttonPrevious.setupState(hoveredStateAttributes);
     buttonPrevious.setupState(idleStateAttributes);
 
-    buttonNext.mixin = 'box'
-    buttonNext['intersect-color-change'] = ''
-    // buttonPrevious.setAttribute('mixin', 'box');
+    buttons.add(buttonNext, pages, buttonPrevious);
+    main.add(cards, buttons)
 
-    console.log(buttonNext)
-    console.log(document.getElementById("box"))
+    // FOOTER
 
-    //
+    let footer = new ThreeMeshUI.Block({
+        width: 1,
+        justifyContent: 'center',
+        alignContent: 'left',
+        margin: 0.02,
+        backgroundOpacity: 0
+    });
 
-    container.add(buttonNext, buttonPrevious);
+    // FOOTER TITLE 
+
+    let footerTitle = new ThreeMeshUI.Block({
+        width: 1,
+        height: 0.15,
+        justifyContent: 'center',
+        alignContent: 'left',
+        margin: 0.02,
+        backgroundOpacity: 0
+    });
+
+    footerTitle.add(
+        new ThreeMeshUI.Text({ content: 'Views' })
+    );
+
+    // FOOTER OPTIONS 
+
+    let footerOptions = new ThreeMeshUI.Block({
+        width: 1,
+        justifyContent: 'center',
+        contentDirection: 'row',
+        margin: 0.02,
+        backgroundOpacity: 0
+    });
+
+    let globeView = new ThreeMeshUI.Block({
+        width: 0.5,
+        height: 0.5,
+        justifyContent: 'center',
+        margin: 0.02,
+        backgroundColor: new THREE.Color("#1E1E1E"),
+        backgroundOpacity: 1
+    });
+
+    let globeIcon = new ThreeMeshUI.Block({
+        width: 0.5,
+        height: 0.5,
+        justifyContent: 'center',
+        margin: 0.02
+    });
+
+    globeView.add(globeIcon)
+
+    let roomView = new ThreeMeshUI.Block({
+        width: 0.5,
+        height: 0.5,
+        justifyContent: 'center',
+        margin: 0.02,
+        backgroundColor: new THREE.Color("#1E1E1E"),
+        backgroundOpacity: 1
+    });
+
+
+    let roomIcon = new ThreeMeshUI.Block({
+        width: 0.5,
+        height: 0.5,
+        justifyContent: 'center',
+        margin: 0.02
+    });
+
+    roomView.add(roomIcon)
+
+    footerOptions.add(globeView, roomView)
+    footer.add(footerTitle, footerOptions)
+
+    // container.add(buttonNext, pages, buttonPrevious);
+    container.add(header, main, footer);
     objsToTest.push(buttonNext, buttonPrevious);
 
+    new THREE.TextureLoader().load(GlobeViewIcon, (texture) => {
+        globeIcon.set({
+            backgroundTexture: texture,
+        });
+    });
+
+    new THREE.TextureLoader().load(RightArrowIcon, (texture) => {
+        buttonNext.set({
+            backgroundTexture: texture,
+        });
+    });
+
+    new THREE.TextureLoader().load(LeftArrowIcon, (texture) => {
+        buttonPrevious.set({
+            backgroundTexture: texture,
+        });
+    });
 }
 
 // Called in the loop, get intersection with either the mouse or the VR controllers,
@@ -1063,7 +1294,7 @@ function raycast() {
 
     return objsToTest.reduce((closestIntersection, obj) => {
 
-        const intersection = raycaster.intersectObject(obj, true);
+        let intersection = raycaster.intersectObject(obj, true);
 
         if (!intersection[0]) return closestIntersection;
 
@@ -1083,68 +1314,3 @@ function raycast() {
 
 
 tick()
-
-
-AFRAME.registerComponent('boxes', {
-    init: function () {
-        var box;
-        var columns = 20;
-        var el = this.el;
-        var i;
-        var j;
-        var rows = 15;
-
-        if (el.sceneEl.isMobile) {
-            columns = 10;
-            rows = 5;
-        };
-
-        for (let x = columns / -2; x < columns / 2; x++) {
-            for (let y = 0.5; y < rows; y++) {
-                box = document.createElement('a-entity');
-                box.setAttribute('mixin', 'box');
-                box.setAttribute('position', { x: x * .6, y: y * .6, z: 1.5 });
-                el.appendChild(box);
-            }
-        }
-    }
-});
-
-AFRAME.registerComponent('shadow-if-mobile', {
-    init: function () {
-        if (!this.el.sceneEl.isMobile) {
-            this.el.setAttribute('light', {
-                castShadow: true,
-                shadowMapWidth: 2048,
-                shadowMapHeight: 1024
-            });
-        }
-    }
-});
-
-AFRAME.registerComponent('intersectColorChange', {
-    init: function () {
-        var el = this.el;
-        var material = el.getAttribute('material');
-        var initialColor = material.color;
-        var self = this;
-
-        el.addEventListener('mousedown', function (evt) {
-            el.setAttribute('material', 'color', '#EF2D5E');
-        });
-
-        el.addEventListener('mouseup', function (evt) {
-            el.setAttribute('material', 'color', self.isMouseEnter ? '#24CAFF' : initialColor);
-        });
-
-        el.addEventListener('mouseenter', function () {
-            el.setAttribute('material', 'color', '#24CAFF');
-            self.isMouseEnter = true;
-        });
-
-        el.addEventListener('mouseleave', function () {
-            el.setAttribute('material', 'color', initialColor);
-            self.isMouseEnter = false;
-        });
-    }
-});

@@ -13,20 +13,26 @@ import earthFragmentShader from './shaders/earth/fragment.glsl'
 import atmosphereVertexShader from './shaders/atmosphere/vertex.glsl'
 import atmosphereFragmentShader from './shaders/atmosphere/fragment.glsl'
 
-
+let conjunctionData = {}
 fetch("https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/exp_conjunctions.json")
     .then(response => response.json())
     .then(data => {
-        console.log(data);
-        data.conjucntions.forEach(conjunction => {
-            console.log(conjunction);
-        });
+        //TODO: Mudar nome de data.conjucntions para data.conjunctions
+        console.log(data.conjucntions)
+        conjunctionData.id = data.conjucntions[0].id
+        conjunctionData.status = data.conjucntions[0].status
+        conjunctionData.targetName = data.conjucntions[0].target.name
+        conjunctionData.latestTCA = data.conjucntions[0].summary.tca_latest
 
+        //TODO: Mudar nome de data.maneouvres para data.manoeuvres
+        conjunctionData.maneouvres = data.conjucntions[0].maneouvres
     })
     .catch(error => {
         // Handle any errors that occurred during the fetch
         console.error('There was a problem with the fetch operation:', error);
     });
+
+console.log(conjunctionData)
 
 // Debug object
 let debugObject = {};
@@ -827,6 +833,7 @@ import GlobeViewIcon from "./assets/images/UI/globe_view_icon.png";
 import RoomViewIcon from "./assets/images/UI/room_view_icon.png";
 import LeftArrowIcon from "./assets/images/UI/left_arrow_icon.png";
 import RightArrowIcon from "./assets/images/UI/right_arrow_icon.png";
+import ConjStatusIcon from "./assets/images/UI/conjunction_status_icon.png";
 
 let meshContainer, meshes, currentMesh;
 let objsToTest = [];
@@ -897,7 +904,7 @@ let cone = new THREE.Mesh(
 
 sphere.visible = box.visible = cone.visible = false;
 
-meshContainer.position.set(-1.4, 2, -1.5);
+meshContainer.position.set(-1.4, 2.5, -1.5);
 meshContainer.add(sphere, box, cone);
 
 meshes = [sphere, box, cone];
@@ -908,8 +915,11 @@ showMesh(currentMesh);
 //////////
 // Panel
 //////////
-
+let container
+let cards
+console.log(container)
 makePanel();
+
 
 // Shows the primitive mesh with the passed ID and hide the others
 
@@ -933,7 +943,7 @@ function makePanel() {
     // We don't define width and height, it will be set automatically from the children's dimensions
     // Note that we set contentDirection: "row-reverse", in order to orient the buttons horizontally
 
-    let container = new ThreeMeshUI.Block({
+    container = new ThreeMeshUI.Block({
         backgroundColor: new THREE.Color("#121212"),
         justifyContent: 'center',
         fontFamily: FontJSON,
@@ -944,8 +954,10 @@ function makePanel() {
         backgroundOpacity: 1
     });
 
-    container.position.set(-1.4, 0.6, -1.2);
-    container.rotation.x = -0.55;
+    container.position.set(-1.4, 1.6, -1.2);
+    // container.rotation.x = -0.55;
+    container.rotation.y = 0.25;
+    container.scale.set(0.5, 0.5, 0.5)
 
     scene.add(container);
 
@@ -956,7 +968,7 @@ function makePanel() {
         height: 0.15,
         justifyContent: 'center',
         contentDirection: 'row',
-        margin: 0.02,
+        margin: 0.025,
         borderRadius: 0,
         backgroundOpacity: 0
     });
@@ -968,6 +980,7 @@ function makePanel() {
         height: 0.15,
         justifyContent: 'center',
         fontSize: 0.1,
+        margin: 0.1,
         backgroundOpacity: 0
     });
 
@@ -1001,28 +1014,104 @@ function makePanel() {
     });
 
     // // Cards
-    let cards = new ThreeMeshUI.Block({
+    cards = new ThreeMeshUI.Block({
         width: 1,
-        height: 0.15,
         justifyContent: 'center',
+        contentDirection: 'column',
         margin: 0.02,
         backgroundOpacity: 0
     });
 
-    let card = new ThreeMeshUI.Block({
+    let card1 = new ThreeMeshUI.Block({
         width: 1,
-        height: 0.15,
-        justifyContent: 'center',
-        contentDirection: 'row-reverse',
-        margin: 0.02,
-        backgroundOpacity: 0
+        height: 0.25,
+        justifyContent: 'space-between',
+        contentDirection: 'row',
+        margin: 0.025,
+        backgroundColor: new THREE.Color("#1E1E1E"),
+        backgroundOpacity: 1,
+        // borderWidth: 0.005,
+        // borderColor: new THREE.Color("#FFBE0B"),
+        // borderOpacity: 1
     });
 
-    card.add(
-        new ThreeMeshUI.Text({ content: 'Card' })
+    let CardNameNStatus = new ThreeMeshUI.Block({
+        width: 0.5,
+        height: 0.2,
+        justifyContent: 'center',
+        contentDirection: 'row',
+        margin: 0.025,
+        backgroundColor: new THREE.Color("#1E1E1E"),
+        backgroundOpacity: 1
+    });
+
+    let CardName = new ThreeMeshUI.Block({
+        width: 0.4,
+        height: 0.25,
+        justifyContent: 'center',
+        alignContent: 'left',
+        backgroundColor: new THREE.Color("#1E1E1E"),
+        backgroundOpacity: 1
+    });
+
+    CardName.add(
+        new ThreeMeshUI.Text({ content: 'AllSat' })
     );
 
-    cards.add(card)
+
+    let CardStatus = new ThreeMeshUI.Block({
+        width: 0.15,
+        height: 0.15,
+        backgroundColor: new THREE.Color("#DB0000"),
+        backgroundOpacity: 1
+    });
+
+    CardNameNStatus.add(CardStatus, CardName)
+
+    let CardTCA = new ThreeMeshUI.Block({
+        width: 0.4,
+        height: 0.25,
+        justifyContent: 'center',
+        contentDirection: 'row',
+        margin: 0.025,
+        backgroundColor: new THREE.Color("#1E1E1E"),
+        backgroundOpacity: 1
+    });
+
+
+    card1.add(CardNameNStatus, CardTCA)
+
+    let card2 = new ThreeMeshUI.Block({
+        width: 1,
+        height: 0.25,
+        justifyContent: 'center',
+        contentDirection: 'row',
+        margin: 0.025,
+        backgroundColor: new THREE.Color("#1E1E1E"),
+        backgroundOpacity: 1
+    });
+
+    let card3 = new ThreeMeshUI.Block({
+        width: 1,
+        height: 0.25,
+        justifyContent: 'center',
+        contentDirection: 'row',
+        margin: 0.025,
+        backgroundColor: new THREE.Color("#1E1E1E"),
+        backgroundOpacity: 1
+    });
+
+    let card4 = new ThreeMeshUI.Block({
+        width: 1,
+        height: 0.25,
+        justifyContent: 'center',
+        contentDirection: 'row',
+        margin: 0.025,
+        backgroundColor: new THREE.Color("#1E1E1E"),
+        backgroundOpacity: 1
+    });
+
+    cards.add(card1, card2, card3, card4)
 
     // BUTTONS
 
@@ -1216,6 +1305,12 @@ function makePanel() {
         });
     });
 
+    new THREE.TextureLoader().load(RoomViewIcon, (texture) => {
+        roomIcon.set({
+            backgroundTexture: texture,
+        });
+    });
+
     new THREE.TextureLoader().load(RightArrowIcon, (texture) => {
         buttonNext.set({
             backgroundTexture: texture,
@@ -1224,6 +1319,12 @@ function makePanel() {
 
     new THREE.TextureLoader().load(LeftArrowIcon, (texture) => {
         buttonPrevious.set({
+            backgroundTexture: texture,
+        });
+    });
+
+    new THREE.TextureLoader().load(ConjStatusIcon, (texture) => {
+        CardStatus.set({
             backgroundTexture: texture,
         });
     });

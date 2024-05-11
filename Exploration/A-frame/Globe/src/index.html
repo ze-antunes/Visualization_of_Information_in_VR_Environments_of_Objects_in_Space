@@ -41,7 +41,7 @@
         ></a-entity> -->
 
         <!-- Oculus Quest Controllers  -->
-        <a-entity
+        <!-- <a-entity
           oculus-touch-controls="hand: left"
           laser-controls="hand: left"
           id="leftController"
@@ -51,6 +51,17 @@
           id="rightController"
           laser-controls="hand: right"
           thumbstick-logging
+        ></a-entity> -->
+        
+        <a-entity
+          id="rightController"
+          laser-controls="hand: right"
+          raycaster
+        ></a-entity>
+        <a-entity
+          id="leftController"
+          laser-controls="hand: left"
+          raycaster
         ></a-entity>
 
         <!-- Hands  -->

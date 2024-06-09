@@ -153,7 +153,7 @@ targetParameters.trajectoryPoints = null
 targetParameters.trajectoryThetaAngle = Math.PI * 2.4
 targetParameters.trajectoryPhiAngle = Math.PI * 0.4
 targetParameters.trajectoryRadius = 1.5
-targetParameters.color = '#26F7FD'
+targetParameters.color = 'lightgreen'
 targetParameters.velocity = 0.05
 
 //Chaser Parameters
@@ -165,7 +165,7 @@ chaserParameters.trajectoryPoints = null
 chaserParameters.trajectoryThetaAngle = Math.PI * 2.1
 chaserParameters.trajectoryPhiAngle = Math.PI * 0
 chaserParameters.trajectoryRadius = 1.5
-chaserParameters.color = 'lightgreen'
+chaserParameters.color = '#26F7FD'
 chaserParameters.velocity = 0.05
 
 // Models
@@ -702,6 +702,7 @@ setTimeout(() => {
     camera = cameraComponent.camera.camera;
 
     renderer = aframeScene.renderer;
+    console.log(aframeScene.renderer)
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(sizes.pixelRatio)
     renderer.setClearColor('#000011')
@@ -710,6 +711,7 @@ setTimeout(() => {
     // Controllers
     ////////////////
     vrControl = vrControl(renderer, camera, scene);
+    console.log(renderer)
 
     scene.add(vrControl.controllerGrips[0], vrControl.controllers[0]);
 
@@ -804,7 +806,7 @@ let tick = () => {
 //         height: 0.5,
 //         padding: 0.05,
 //         justifyContent: 'center',
-//         alignContent: 'left',
+//         textAlign: 'left',
 //         fontFamily: 'https://unpkg.com/three-mesh-ui/examples/assets/Roboto-msdf.json',
 //         fontTexture: 'https://unpkg.com/three-mesh-ui/examples/assets/Roboto-msdf.png'
 //     });
@@ -917,7 +919,7 @@ showMesh(currentMesh);
 //////////
 let container
 let cards
-console.log(container)
+// console.log(container)
 makePanel();
 
 
@@ -1049,7 +1051,7 @@ function makePanel() {
         width: 0.4,
         height: 0.25,
         justifyContent: 'center',
-        alignContent: 'left',
+        textAlign: 'left',
         backgroundColor: new THREE.Color("#1E1E1E"),
         backgroundOpacity: 1
     });
@@ -1195,7 +1197,7 @@ function makePanel() {
 
             currentMesh = (currentMesh + 1) % 3;
             showMesh(currentMesh);
-
+            console.log("test bottonNext")
         }
     });
     buttonNext.setupState(hoveredStateAttributes);
@@ -1225,7 +1227,7 @@ function makePanel() {
     let footer = new ThreeMeshUI.Block({
         width: 1,
         justifyContent: 'center',
-        alignContent: 'left',
+        textAlign: 'left',
         margin: 0.02,
         backgroundOpacity: 0
     });
@@ -1236,7 +1238,7 @@ function makePanel() {
         width: 1,
         height: 0.15,
         justifyContent: 'center',
-        alignContent: 'left',
+        textAlign: 'left',
         margin: 0.02,
         backgroundOpacity: 0
     });
@@ -1344,65 +1346,63 @@ function updateButtons() {
         vrControl.setFromController(0, raycaster.ray);
 
         intersect = raycast();
-
+        
         // Position the little white dot at the end of the controller pointing ray
         if (intersect) vrControl.setPointerAt(0, intersect.point);
-
+        
     } else if (mouse.x !== null && mouse.y !== null) {
-
+        
         raycaster.setFromCamera(mouse, camera);
-
+        
         intersect = raycast();
-
+        
     }
-
+    
     // Update targeted button state (if any)
-
+    
     if (intersect && intersect.object.isUI) {
-
+        
         if (selectState) {
-
+            
             // Component.setState internally call component.set with the options you defined in component.setupState
             intersect.object.setState('selected');
-
         } else {
-
+            
             // Component.setState internally call component.set with the options you defined in component.setupState
             intersect.object.setState('hovered');
-
+            
         }
-
+        
     }
-
+    
     // Update non-targeted buttons state
-
+    
     objsToTest.forEach((obj) => {
-
+        
         if ((!intersect || obj !== intersect.object) && obj.isUI) {
-
+            
             // Component.setState internally call component.set with the options you defined in component.setupState
             obj.setState('idle');
-
         }
-
+        
     });
-
+    
 }
 
 //
 
 function raycast() {
-
+    
     return objsToTest.reduce((closestIntersection, obj) => {
-
+        
         let intersection = raycaster.intersectObject(obj, true);
-
+        
         if (!intersection[0]) return closestIntersection;
-
+        
         if (!closestIntersection || intersection[0].distance < closestIntersection.distance) {
-
+            
             intersection[0].object = obj;
-
+            
             return intersection[0];
 
         }

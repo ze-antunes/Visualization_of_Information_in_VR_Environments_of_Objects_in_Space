@@ -4,7 +4,7 @@
       "id": "01HRRZF6Q22TSQKZMTRZ442DJ9",
       "target": {
         "id": "01H81FWYPJ2C0G6FHVKRQKCJA2",
-        "name": "AllSat"
+        "name": "Satelite 1"
       },
       "chaser": {
         "id": "01HQ0FG5GPEG9GHSKY6RCDMQSV",
@@ -357,7 +357,7 @@
       "id": "01HRRZWSRQ2FV7RFQD7VAH8NJG",
       "target": {
         "id": "01H81FWYPJ2C0G6FHVKRQKCJA2",
-        "name": "AllSat"
+        "name": "Satelite 2"
       },
       "chaser": {
         "id": "01HMBZ91Y115RSHSDC75XE7HHD",
@@ -714,7 +714,7 @@
       "id": "01HRS5CE321CAP60MQBXJMA2ZM",
       "target": {
         "id": "01H81FWYPJ2C0G6FHVKRQKCJA2",
-        "name": "AllSat"
+        "name": "Satelite 3"
       },
       "chaser": {
         "id": "01HMBZ91Y115RSHSDC75XE7HHD",

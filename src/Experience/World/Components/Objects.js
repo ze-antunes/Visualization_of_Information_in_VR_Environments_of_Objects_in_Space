@@ -66,20 +66,20 @@ export default class Objects {
         });
 
         this.view.add(this.model)
-        // this.setPopup()
+        this.setPopup()
         this.objsToTest.push(this.model)
     }
 
-    // setPopup() {
-    //     this.popup = new ObjectPopup(this.type, "LEMUR-2-ZACHARY", this);
-    //     this.model.popup = this.popup
-    // }
+    setPopup() {
+        this.popup = new ObjectPopup(this.type, "LEMUR-2-ZACHARY", this);
+        this.model.popup = this.popup
+    }
 
     update() {
         this.model.thetaAngle = this.time.elapsed * this.modelParameters.velocity
         this.model.position.x = Math.cos(this.model.thetaAngle) * this.modelParameters.trajectoryRadius
         this.model.position.y = Math.sin(this.model.thetaAngle) * Math.sin(this.modelParameters.trajectoryPhiAngle) * this.modelParameters.trajectoryRadius
         this.model.position.z = Math.sin(this.model.thetaAngle) * Math.cos(this.modelParameters.trajectoryPhiAngle) * this.modelParameters.trajectoryRadius
-        // this.popup.update()
+        this.popup.update()
     }
 }

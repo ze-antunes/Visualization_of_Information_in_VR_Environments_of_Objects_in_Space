@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+// import * as THREE from 'three'
 import Experience from "../Experience";
 import Globe from './Components/Globe';
 import Room from './Components/Room';
@@ -43,6 +43,7 @@ export default class World {
         this.conjunctionsMenu.setHeader()
         this.conjunctionsMenu.setGrid(4)
         this.conjunctionsMenu.setViews()
+        // this.conjunctionsMenu.hide()
     }
 
     setManoeuvresMenu() {
@@ -55,6 +56,7 @@ export default class World {
         this.manoeuvresMenu.mesh.scale.set(0.5, 0.5, 0.5)
         this.manoeuvresMenu.setHeader()
         this.manoeuvresMenu.setGrid(7)
+        // this.manoeuvresMenu.hide()
     }
 
     update() {

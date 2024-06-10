@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+// import * as THREE from 'three'
 import Experience from "./Experience"
 
 export default class Renderer {
@@ -18,7 +18,7 @@ export default class Renderer {
             this.renderer = this.aframeScene.renderer
             this.renderer.setClearColor('#000011')
             this.renderer.antialias = true
-        }, 10)
+        }, 100)
     }
 
     resize() {

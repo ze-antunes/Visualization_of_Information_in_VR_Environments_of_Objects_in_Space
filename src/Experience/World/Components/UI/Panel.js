@@ -49,4 +49,14 @@ export default class Panel {
     setViews() {
         this.views = new Views(this.mesh)
     }
+
+    hide() {
+        this.mesh.scale.set(0, 0, 0)
+        this.isOpen = false
+    }
+
+    show() {
+        this.mesh.scale.set(0.5, 0.5, 0.5)
+        this.isOpen = true
+    }
 }

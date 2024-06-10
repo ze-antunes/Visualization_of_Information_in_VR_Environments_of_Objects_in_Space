@@ -42,7 +42,7 @@ export default class Raycaster {
         this.aframeScene = this.experience.aframeScene
         this.resources = this.experience.resources
         this.debug = this.experience.debug
-        this.leftHand = this.experience.leftHand
+        this.rightHand = this.experience.rightHand
 
         //Setup 
         this.objsToTest = [];
@@ -55,35 +55,36 @@ export default class Raycaster {
         setTimeout(() => {
             this.renderer = this.aframeScene.renderer
             this.camera = this.aframeScene.camera
-
+            
+            // console.log(this.experience.scene)
             vrControl = vrControl(this.renderer, this.camera, this.scene);
 
             this.scene.add(vrControl.controllerGrips[0], vrControl.controllers[0], vrControl.controllerGrips[1], vrControl.controllers[1]);
 
-            // vrControl.controllers[0].addEventListener('selectstart', () => {
-
-            //     selectState = true;
-
-            // });
-            // vrControl.controllers[0].addEventListener('selectend', () => {
-
-            //     selectState = false;
-
-            // });
-
-            vrControl.controllers[1].addEventListener('selectstart', () => {
+            vrControl.controllers[0].addEventListener('selectstart', () => {
 
                 selectState = true;
 
             });
-            vrControl.controllers[1].addEventListener('selectend', () => {
+            vrControl.controllers[0].addEventListener('selectend', () => {
 
                 selectState = false;
 
             });
 
+            // vrControl.controllers[1].addEventListener('selectstart', () => {
+
+            //     selectState = true;
+
+            // });
+            // vrControl.controllers[1].addEventListener('selectend', () => {
+
+            //     selectState = false;
+
+            // });
+
             // Access the raycaster component
-            let raycasterComponent = this.leftHand.components.raycaster
+            let raycasterComponent = this.rightHand.components.raycaster
             // console.log(this.rightHand.components.raycaster)
 
             this.raycaster = new THREE.Raycaster();
@@ -99,15 +100,15 @@ export default class Raycaster {
 
         if (this.renderer != undefined && this.renderer.xr.isPresenting) {
 
-            // vrControl.setFromController(0, this.raycaster.ray);
-            vrControl.setFromController(1, this.raycaster.ray);
+            vrControl.setFromController(0, this.raycaster.ray);
+            // vrControl.setFromController(1, this.raycaster.ray);
 
             intersect = this.raycast();
 
             // Position the little white dot at the end of the controller pointing ray
             if (intersect) {
-                // vrControl.setPointerAt(0, intersect.point);
-                vrControl.setPointerAt(1, intersect.point);
+                vrControl.setPointerAt(0, intersect.point);
+                // vrControl.setPointerAt(1, intersect.point);
             }
 
         } else if (mouse.x !== null && mouse.y !== null) {
@@ -139,22 +140,22 @@ export default class Raycaster {
         //     console.log("clicks: ", this.clicks)
         // }
 
-        // Update threejs object intersection 
-        if (intersect && intersect.object.hasStates) {
-            // console.log(intersect.object)
-            if (selectState) {
-                if (this.open == false && this.clicks == 0) {
-                    this.open = true
-                    this.clicks++
-                    console.log(this.open, this.clicks)
-                }
-                if (this.open == true && this.clicks > 0) {
-                    this.open = false
-                    this.clicks = 0
-                    console.log(this.open, this.clicks)
-                }
-            }
-        }
+        // // Update threejs object intersection 
+        // if (intersect && intersect.object.hasStates) {
+        //     // console.log(intersect.object)
+        //     if (selectState) {
+        //         if (this.open == false && this.clicks == 0) {
+        //             this.open = true
+        //             this.clicks++
+        //             console.log(this.open, this.clicks)
+        //         }
+        //         if (this.open == true && this.clicks > 0) {
+        //             this.open = false
+        //             this.clicks = 0
+        //             console.log(this.open, this.clicks)
+        //         }
+        //     }
+        // }
 
         if (intersect && intersect.object.isUI) {
 

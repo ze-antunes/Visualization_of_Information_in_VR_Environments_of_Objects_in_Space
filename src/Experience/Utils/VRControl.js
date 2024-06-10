@@ -1,12 +1,9 @@
-/*
-	Job: creating the VR controllers and their pointers
-*/
-
 import * as THREE from 'three';
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
 
 export default function VRControl( renderer ) {
 
+	console.log(renderer)
 	const controllers = [];
 	const controllerGrips = [];
 

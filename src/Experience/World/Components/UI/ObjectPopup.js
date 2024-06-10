@@ -22,7 +22,7 @@ export default class ObjectPopup {
 
         this.setTextures()
         this.setInfo()
-        // this.hide()
+        this.hide()
     }
 
     setTextures() {

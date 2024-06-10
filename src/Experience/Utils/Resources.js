@@ -22,9 +22,17 @@ export default class Resources extends EventEmitter {
     
     setLoaders() {
         this.loaders = {}
-        this.loaders.gltfLoader = new GLTFLoader()
-        this.loaders.textureLoader = new THREE.TextureLoader()
-        this.loaders.cubeTextureLoader = new THREE.CubeTextureLoader()
+        this.loadingManager = new THREE.LoadingManager()
+        let progressBar = document.getElementById('progress-bar')
+
+        this.loadingManager.onProgress = (url, loaded, total) => {
+            // console.log(`start loading: ${url}`)
+            progressBar.value = (loaded / total) * 100
+        }
+
+        this.loaders.gltfLoader = new GLTFLoader(this.loadingManager)
+        this.loaders.textureLoader = new THREE.TextureLoader(this.loadingManager)
+        this.loaders.cubeTextureLoader = new THREE.CubeTextureLoader(this.loadingManager)
     }
     
     startLoading() {

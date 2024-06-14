@@ -9,6 +9,8 @@ export default class Views {
         this.time = this.experience.time
         this.resources = this.experience.resources
         this.debug = this.experience.debug
+        this.globeView = this.experience.world.globe
+        this.roomView = this.experience.world.room
 
         // Setup 
         this.panel = panel
@@ -61,7 +63,7 @@ export default class Views {
             backgroundOpacity: 0
         });
 
-        this.globeView = new ThreeMeshUI.Block({
+        this.globeViewButton = new ThreeMeshUI.Block({
             width: 0.5,
             height: 0.5,
             justifyContent: 'center',
@@ -81,9 +83,9 @@ export default class Views {
             backgroundTexture: this.textures.globeViewIcon,
         });
 
-        this.globeView.add(globeIcon)
+        this.globeViewButton.add(globeIcon)
 
-        this.roomView = new ThreeMeshUI.Block({
+        this.roomViewButton = new ThreeMeshUI.Block({
             width: 0.5,
             height: 0.5,
             justifyContent: 'center',
@@ -104,7 +106,7 @@ export default class Views {
             backgroundTexture: this.textures.roomViewIcon,
         });
 
-        this.roomView.add(roomIcon)
+        this.roomViewButton.add(roomIcon)
 
         let hoveredStateAttributes = {
             state: 'hovered',
@@ -134,29 +136,31 @@ export default class Views {
             borderOpacity: 1
         };
 
-        this.globeView.setupState({
+        this.globeViewButton.setupState({
             state: 'selected',
             attributes: selectedAttributes,
             onSet: () => {
-                console.log("test this.globeView botton")
+                this.roomView.hide()
+                this.globeView.show()
             }
         });
-        this.globeView.setupState(hoveredStateAttributes)
-        this.globeView.setupState(idleStateAttributes)
+        this.globeViewButton.setupState(hoveredStateAttributes)
+        this.globeViewButton.setupState(idleStateAttributes)
 
-        this.roomView.setupState({
+        this.roomViewButton.setupState({
             state: 'selected',
             attributes: selectedAttributes,
             onSet: () => {
-                console.log("test this.roomView botton")
+                this.globeView.hide()
+                this.roomView.show()
             }
         });
-        this.roomView.setupState(hoveredStateAttributes)
-        this.roomView.setupState(idleStateAttributes)
+        this.roomViewButton.setupState(hoveredStateAttributes)
+        this.roomViewButton.setupState(idleStateAttributes)
         
-        footerOptions.add(this.globeView, this.roomView)
+        footerOptions.add(this.globeViewButton, this.roomViewButton)
         footer.add(footerTitle, footerOptions)
         this.panel.add(footer)
-        this.objsToTest.push(this.globeView, this.roomView)
+        this.objsToTest.push(this.globeViewButton, this.roomViewButton)
     }
 } 

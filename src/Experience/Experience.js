@@ -25,8 +25,10 @@ export default class Experience {
         //Global acess
         window.experience = this
 
+        
         // Setup 
         this.debug = new Debug()
+        this.vr = window.location.hash == '#vr'
         this.stats = new Stats()
         this.sizes = new Sizes()
         this.time = new Time()

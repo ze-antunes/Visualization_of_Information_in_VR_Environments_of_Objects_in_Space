@@ -3,7 +3,6 @@ import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerM
 
 export default function VRControl( renderer ) {
 
-	console.log(renderer)
 	const controllers = [];
 	const controllerGrips = [];
 

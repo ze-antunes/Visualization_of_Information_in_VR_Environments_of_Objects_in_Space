@@ -4,7 +4,7 @@ import Experience from "../../../Experience"
 import ConjunctionCard from './ConjunctionCard'
 import ManoeuvreCard from './ManoeuvreCard'
 import Pages from "./Pages"
-
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 
 export default class Grid {
     constructor(panel, cardType, maxCardsLength, numbCards) {
@@ -69,6 +69,7 @@ export default class Grid {
         this.cards.push(this.card)
         this.cardsCreated++
 
+        // // this.mergedGeometry = BufferGeometryUtils.mergeGeometries(geometries)
         // if (this.cardsCreated === this.maxCardsLength) {
         //     console.log("All cards created")
         // }

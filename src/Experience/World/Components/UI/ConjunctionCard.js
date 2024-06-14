@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import ThreeMeshUI from 'three-mesh-ui'
 import Experience from "../../../Experience"
 
@@ -14,6 +15,7 @@ export default class ConjunctionCard {
         this.cardInfo = cardInfo
         this.id = id
         this.objsToTest = this.experience.raycaster.objsToTest
+        this.geometries = []
 
         this.setTextures()
         this.setCard()
@@ -78,7 +80,6 @@ export default class ConjunctionCard {
         });
         this.card.setupState(hoveredStateAttributes);
         this.card.setupState(idleStateAttributes);
-
 
         this.grid.add(this.card)
         this.objsToTest.push(this.card)
@@ -150,6 +151,15 @@ export default class ConjunctionCard {
         );
 
         this.card.add(CardNameNStatus, CardTCA)
+        // for (let i = 0; i < this.card.children.length; i++) {
+        //     if (this.card.children[i].geometry) {
+        //         this.geometries.push(this.card.children[i].geometry)
+        //     } else {
+        //         console.log("----------------")
+        //     }
+        // }
+
+        // this.mergedGeometry = BufferGeometryUtils.mergeGeometries(this.geometries)
     }
 
     setValueTCA(isoDateString) {
@@ -182,38 +192,29 @@ export default class ConjunctionCard {
         }
     }
 
-    // destroy() {
-    //     this.grid.remove(this.card)
-    // }
+    destroy() {
+        // Properly dispose of ThreeMeshUI objects and their geometries/materials
+        this.card.traverse(child => {
+            if (child.isMesh) {
+                if (child.geometry) {
+                    child.geometry.dispose();
+                }
+                if (child.material) {
+                    if (Array.isArray(child.material)) {
+                        child.material.forEach(mat => mat.dispose());
+                    } else {
+                        child.material.dispose();
+                    }
+                }
+            }
+        });
 
-    // destroy() {
-    //     console.log(this.mesh)
-    //     // Traverse the whole mesh
-    //     this.mesh.traverse((child) => {
-    //         if (child instanceof ThreeMeshUI.Block) {
-    //             // console.log(child)
+        // Remove the card from the grid and raycaster's test objects
+        this.grid.remove(this.card);
 
-    //             for (let i = 0; i < child.children.length; i++) {
-    //                 // console.log(child.children[i])
-    //                 if (child.children[i] instanceof ThreeMeshUI.Text) {
-    //                     // child.children[i].geometry.dispose()
-    //                     setTimeout(() => {
-    //                         console.log(child.children[i].children[0].geometry)
-    //                         child.children[i].children[0].geometry.dispose()
-    //                         console.log("child.children[i].geometry.dispose()")
-
-    //                         for (let key in child.children[i].children[0].material) {
-    //                             let value = child.children[i].children[0].material[key]
-
-    //                             if (value && value.dispose === 'function') {
-    //                                 // value.dispose()
-    //                                 console.log("value.dispose()")
-    //                             }
-    //                         }
-    //                     }, 1);
-    //                 }
-    //             }
-    //         }
-    //     })
-    // }
+        const index = this.objsToTest.indexOf(this.card);
+        if (index > -1) {
+            this.objsToTest.splice(index, 1);
+        }
+    }
 }

@@ -24,9 +24,11 @@ export default class Resources extends EventEmitter {
         this.loaders = {}
         this.loadingManager = new THREE.LoadingManager()
         let progressBar = document.getElementById('progress-bar')
+        let label = document.getElementById('progress-bar-label')
 
         this.loadingManager.onProgress = (url, loaded, total) => {
             // console.log(`start loading: ${url}`)
+            label.innerHTML = (((loaded / total) * 100).toFixed(0)).toString() + " %"
             progressBar.value = (loaded / total) * 100
         }
 

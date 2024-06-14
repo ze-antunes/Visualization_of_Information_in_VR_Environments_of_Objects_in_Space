@@ -11,12 +11,12 @@ export default class Objects {
         this.scene = this.experience.scene
         this.time = this.experience.time
         this.debug = this.experience.debug
-        
+
         // Debug
         // if (this.debug.active) {
         //     this.debugFolder = this.debug.ui.addFolder('Objects')
         // }
-        
+
         // Setup 
         this.resource = resource
         this.type = type
@@ -32,7 +32,7 @@ export default class Objects {
         this.setModel()
 
         if (this.model && this.modelParameters) {
-            this.covariance = new Covariance(this.model, this.modelParameters)
+            this.covariance = new Covariance(this.model, this.modelParameters, this.type)
             this.trajectory = new Trajectory(this.model, this.modelParameters)
         }
     }
@@ -45,7 +45,10 @@ export default class Objects {
         this.modelParameters.trajectoryRadius = this.radius
         this.modelParameters.color = this.color
         this.modelParameters.velocity = this.velocity
-        this.model.scale.set(0.05, 0.05, 0.05)
+        if (this.type === "target")
+            this.model.scale.set(0.05, 0.05, 0.05)
+        else
+            this.model.scale.set(0.005, 0.005, 0.005)
         this.model.hasStates = true
         this.model.states = {}
 

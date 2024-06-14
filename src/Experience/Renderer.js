@@ -18,6 +18,7 @@ export default class Renderer {
             this.renderer = this.aframeScene.renderer
             this.renderer.setClearColor('#000011')
             this.renderer.antialias = true
+            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
         }, 100)
     }
 

@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import Experience from '../../Experience'
 import Objects from './Objects'
+import gsap from 'gsap'
 
 export default class Room {
     constructor() {
@@ -15,6 +16,7 @@ export default class Room {
         this.chaser = new Objects(this.roomView, this.resources.items.chaser1Model,'chaser', 'lightblue', Math.PI * 2.1, Math.PI * 0, 1.5, 0.00015)
 
         this.setRoom()
+        this.hide()
     }
 
     setRoom() {
@@ -75,5 +77,15 @@ export default class Room {
 
     update() {
         console.log("room update")
+    }
+
+    show() {
+        gsap.to(this.roomView.position, 1, { x: 0, ease: "easeInOut" })
+        gsap.to(this.roomView.scale, { x: 1, y: 1, z: 1 })
+    }
+
+    hide() {
+        gsap.to(this.roomView.position, 1, { x: 5, ease: "easeInOut" })
+        gsap.to(this.roomView.scale, { x: 0, y: 0, z: 0 })
     }
 }

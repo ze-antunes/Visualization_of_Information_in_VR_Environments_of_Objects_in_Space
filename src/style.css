@@ -239,7 +239,7 @@ body {
 .progress-bar-container {
   position: absolute;
   left: 50%;
-  top: 65%;
+  top: 75%;
   transform: translate(-50%, -50%);
   width: 300px;
   display: flex;
@@ -276,4 +276,10 @@ body {
 
 #progress-bar[value]::-webkit-progress-value {
   border-radius: 50px;
+}
+
+label {
+  font-family: 'Roboto';
+  color: white;
+  padding: 20px;
 }

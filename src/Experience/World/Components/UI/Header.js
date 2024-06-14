@@ -74,31 +74,11 @@ export default class Header {
         //     new ThreeMeshUI.Text({ content: 'options' })
         // );
 
-        this.search = new ThreeMeshUI.Block({
-            width: 0.1,
-            height: 0.1,
-            justifyContent: 'center',
-        });
-
-        this.columns = new ThreeMeshUI.Block({
-            width: 0.1,
-            height: 0.1,
-            justifyContent: 'center',
-        });
-
         this.info = new ThreeMeshUI.Block({
             width: 0.1,
             height: 0.1,
             margin: 0.05,
             justifyContent: 'center',
-        });
-
-        this.search.set({
-            backgroundTexture: this.textures.searchIcon,
-        });
-
-        this.columns.set({
-            backgroundTexture: this.textures.oneColumnIcon,
         });
 
         this.info.set({
@@ -132,28 +112,6 @@ export default class Header {
             borderOpacity: 1
         };
 
-        this.columns.setupState({
-            state: 'selected',
-            attributes: selectedAttributes,
-            onSet: () => {
-                console.log("test columns")
-            }
-        });
-
-        this.columns.setupState(hoveredStateAttributes);
-        this.columns.setupState(idleStateAttributes);
-
-        this.search.setupState({
-            state: 'selected',
-            attributes: selectedAttributes,
-            onSet: () => {
-                console.log("develop search bar + keyboard")
-            }
-        });
-
-        this.search.setupState(hoveredStateAttributes);
-        this.search.setupState(idleStateAttributes);
-
         this.infoOpen = false
 
         this.info.setupState({
@@ -176,15 +134,59 @@ export default class Header {
         this.info.setupState(idleStateAttributes);
 
         if (this.cardType === 'manoeuvreCard') {
+            this.columns = new ThreeMeshUI.Block({
+                width: 0.1,
+                height: 0.1,
+                justifyContent: 'center',
+            });
+
+            this.columns.set({
+                backgroundTexture: this.textures.oneColumnIcon,
+            });
+
+            this.columns.setupState({
+                state: 'selected',
+                attributes: selectedAttributes,
+                onSet: () => {
+                    console.log("test columns")
+                }
+            });
+
+            this.columns.setupState(hoveredStateAttributes);
+            this.columns.setupState(idleStateAttributes);
+
             options.add(this.columns, this.info)
+            this.objsToTest.push(this.columns, this.info)
         }
         else {
+            this.search = new ThreeMeshUI.Block({
+                width: 0.1,
+                height: 0.1,
+                justifyContent: 'center',
+            });
+
+            this.search.set({
+                backgroundTexture: this.textures.searchIcon,
+            });
+
+            this.search.setupState({
+                state: 'selected',
+                attributes: selectedAttributes,
+                onSet: () => {
+                    console.log("develop search bar + keyboard")
+                }
+            });
+
+            this.search.setupState(hoveredStateAttributes);
+            this.search.setupState(idleStateAttributes);
+
             options.add(this.search, this.info)
+            this.objsToTest.push(this.search, this.info)
         }
 
         this.header.add(title, options)
         this.panel.add(this.header)
-        this.objsToTest.push(this.columns, this.search, this.info)
+
     }
 
     setInfoPopup() {

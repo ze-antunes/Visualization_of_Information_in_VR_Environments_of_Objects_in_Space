@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VR Satellite Visualization</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto"
+      rel="stylesheet"
+    />
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aframe-blink-controls/dist/aframe-blink-controls.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.misc.min.js"></script>
@@ -13,7 +17,6 @@
     <a-scene
       id="myScene"
       light="defaultLightsEnabled: true"
-      renderer="antialias: true"
     >
       <a-box
         id="collisionBox"
@@ -23,13 +26,13 @@
         depth="0"
       >
         <a-entity
-          position="-5 0 0"
+          position="0 0 0"
           id="globe"
           scale="0.7 0.7 0.7"
           three-js-globe
         >
         </a-entity>
-        <a-entity position="0 0 0" id="room" three-js-room></a-entity>
+        <a-entity position="5 0 0" id="room" three-js-room></a-entity>
       </a-box>
 
       <a-entity>
@@ -42,13 +45,14 @@
         ></a-entity>
         <a-entity
           id="rightController"
-          laser-controls="hand: right"
-          raycaster="showLine: true; objects: #globe, #room, #collisionBox"
+          oculus-touch-controls="hand: right"
+          raycaster="showLine: false; objects: #globe, #room, #collisionBox"
         ></a-entity>
         <a-entity
+          aframe-left-control
           id="leftController"
-          laser-controls="hand: left"
-          raycaster="showLine: true; objects: #globe, #room, #collisionBox"
+          oculus-touch-controls="hand: left"
+          raycaster="showLine: false; objects: #globe, #room, #collisionBox"
         ></a-entity>
       </a-entity>
     </a-scene>
@@ -76,6 +80,7 @@
         </div>
       </div>
       <div class="progress-bar-container">
+        <label id="progress-bar-label" for="progress-bar">0 %</label>
         <progress id="progress-bar" value="0" max="100"></progress>
       </div>
     </div>

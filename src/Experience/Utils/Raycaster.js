@@ -89,7 +89,9 @@ export default class Raycaster {
 
             this.raycaster = new THREE.Raycaster();
             this.raycaster = raycasterComponent.raycaster;
-        }, 1)
+
+            // this.update()
+        }, 100)
 
     }
 
@@ -111,7 +113,7 @@ export default class Raycaster {
                 // vrControl.setPointerAt(1, intersect.point);
             }
 
-        } else if (mouse.x !== null && mouse.y !== null) {
+        } else if (mouse.x !== null && mouse.y !== null && this.renderer != undefined && this.raycaster != undefined) {
 
             this.raycaster.setFromCamera(mouse, this.camera);
 

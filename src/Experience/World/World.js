@@ -1,4 +1,5 @@
 // import * as THREE from 'three'
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import Experience from "../Experience";
 import Globe from './Components/Globe';
 import Room from './Components/Room';
@@ -10,6 +11,8 @@ export default class World {
         this.experience = new Experience()
         this.scene = this.experience.scene
         this.camera = this.experience.camera
+        this.renderer = this.experience.renderer
+        this.vr = this.experience.vr
         this.aframeScene = this.experience.aframeScene
         this.resources = this.experience.resources
         this.data = this.experience.data
@@ -17,7 +20,9 @@ export default class World {
         this.roomView = this.experience.roomView
         this.rightHand = this.experience.rightHand
         this.leftHand = this.experience.leftHand
-        
+
+        // console.log(this.data)
+
         // Wait for resources
         // when the resources are ready we can instanciate the environment
         this.resources.on('ready', () => {
@@ -29,8 +34,8 @@ export default class World {
             this.setConjunctionsMenu()
             this.setManoeuvresMenu()
             this.environment = new Environment()
+            console.log(this.renderer.renderer.info)
         })
-
     }
 
     setConjunctionsMenu() {
@@ -44,6 +49,18 @@ export default class World {
         this.conjunctionsMenu.setGrid(4)
         this.conjunctionsMenu.setViews()
         // this.conjunctionsMenu.hide()
+
+        // this.leftHand.addEventListener('ybuttondown', function (e) {
+        //     this.conjunctionsMenu.hide()
+        //     // this.manoeuvresMenu.hide()
+        //     // console.log("hide")
+        // })
+
+        // this.leftHand.addEventListener('xbuttondown', function (e) {
+        //     this.conjunctionsMenu.show()
+        //     // this.manoeuvresMenu.show()
+        //     // console.log("show")
+        // })
     }
 
     setManoeuvresMenu() {
@@ -62,17 +79,23 @@ export default class World {
     update() {
         if (this.globe)
             this.globe.update()
-        // if (this.leftHand && this.conjunctionsMenu) {
-        //     this.conjunctionsMenu.mesh.position.set(this.leftHand.object3D.position.x + 0.1, this.leftHand.object3D.position.y, this.leftHand.object3D.position.z - 0.2)
-        //     // console.log(this.rightHand.object3D.rotation)
-        //     // this.conjunctionsMenu.mesh.rotation.set(this.leftHand.object3D.rotation.x - 55, this.leftHand.object3D.rotation.y + 180, 0)
-        //     this.conjunctionsMenu.mesh.lookAt(this.camera.object3D.position.x, this.camera.object3D.position.y, this.camera.object3D.position.z)
-        // }
-        // if (this.rightHand && this.manoeuvresMenu) {
-        //     this.manoeuvresMenu.mesh.position.set(this.rightHand.object3D.position.x - 0.1, this.rightHand.object3D.position.y, this.rightHand.object3D.position.z - 0.2)
-        //     // console.log(this.leftHand.object3D.rotation)
-        //     // this.manoeuvresMenu.mesh.rotation.set(this.rightHand.object3D.rotation.x - 55, this.rightHand.object3D.rotation.y + 180, 0)
-        //     this.manoeuvresMenu.mesh.lookAt(this.camera.object3D.position.x, this.camera.object3D.position.y, this.camera.object3D.position.z)
-        // }
+
+        if (this.vr) {
+            if (this.leftHand && this.conjunctionsMenu) {
+                this.conjunctionsMenu.mesh.scale.set(0.1, 0.1, 0.1)
+                this.conjunctionsMenu.mesh.position.set(this.leftHand.object3D.position.x + 0.1, this.leftHand.object3D.position.y, this.leftHand.object3D.position.z - 0.2)
+                // console.log(this.rightHand.object3D.rotation)
+                // this.conjunctionsMenu.mesh.rotation.set(this.leftHand.object3D.rotation.x - 55, this.leftHand.object3D.rotation.y + 180, 0)
+                this.conjunctionsMenu.mesh.lookAt(this.camera.object3D.position.x, this.camera.object3D.position.y, this.camera.object3D.position.z)
+            }
+            if (this.rightHand && this.manoeuvresMenu) {
+                this.manoeuvresMenu.mesh.scale.set(0.1, 0.1, 0.1)
+                this.manoeuvresMenu.mesh.position.set(this.rightHand.object3D.position.x - 0.1, this.rightHand.object3D.position.y, this.rightHand.object3D.position.z - 0.2)
+                // console.log(this.leftHand.object3D.rotation)
+                // this.manoeuvresMenu.mesh.rotation.set(this.rightHand.object3D.rotation.x - 55, this.rightHand.object3D.rotation.y + 180, 0)
+                this.manoeuvresMenu.mesh.lookAt(this.camera.object3D.position.x, this.camera.object3D.position.y, this.camera.object3D.position.z)
+            }
+        }
+
     }
 }

@@ -1,6 +1,7 @@
 // import * as THREE from 'three'
 import Experience from '../../Experience'
 import Objects from './Objects'
+import gsap from 'gsap'
 
 import earthVertexShader from '../../Shaders/earth/vertex.glsl'
 import earthFragmentShader from '../../Shaders/earth/fragment.glsl'
@@ -57,6 +58,7 @@ export default class Globe {
         this.earthParameters.atmosphereTwilightColor = '#ffbc8f'
 
         this.earthMaterial = new THREE.ShaderMaterial({
+            precission: "lowp",
             vertexShader: earthVertexShader,
             fragmentShader: earthFragmentShader,
             uniforms:
@@ -71,6 +73,7 @@ export default class Globe {
         })
 
         this.atmosphereMaterial = new THREE.ShaderMaterial({
+            precission: "lowp",
             vertexShader: atmosphereVertexShader,
             fragmentShader: atmosphereFragmentShader,
             uniforms:
@@ -164,5 +167,22 @@ export default class Globe {
             this.target.update()
         if (this.chaser)
             this.chaser.update()
+    }
+
+    show() {
+        gsap.to(this.globeView.position, 1, { x: 0, ease: "easeInOut" })
+        gsap.to(this.globeView.scale, { x: 0.7, y: 0.7, z: 0.7 })
+    }
+
+    hide() {
+        gsap.to(this.globeView.position, 1, { x: -5, ease: "easeInOut" })
+        gsap.to(this.globeView.scale, { x: 0, y: 0, z: 0 })
+    }
+
+    destroy() {
+        console.log("destroy")
+        this.globeView.remove(this.earth)
+        this.earth.geometry.dispose()
+        this.earth.material.dispose()
     }
 }

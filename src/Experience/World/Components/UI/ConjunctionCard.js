@@ -2,10 +2,12 @@ import * as THREE from 'three'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import ThreeMeshUI from 'three-mesh-ui'
 import Experience from "../../../Experience"
+import Panel from './Panel'
 
 export default class ConjunctionCard {
     constructor(grid, cardInfo, id) {
         this.experience = new Experience()
+        this.world = this.experience.world
         this.scene = this.experience.scene
         this.time = this.experience.time
         this.resources = this.experience.resources
@@ -15,7 +17,7 @@ export default class ConjunctionCard {
         this.cardInfo = cardInfo
         this.id = id
         this.objsToTest = this.experience.raycaster.objsToTest
-        this.geometries = []
+        // this.geometries = []
 
         this.setTextures()
         this.setCard()
@@ -75,7 +77,7 @@ export default class ConjunctionCard {
             attributes: selectedAttributes,
             onSet: () => {
                 this.experience.world.conjunctionsMenu.grid.setActiveCard(this)
-                // console.log(this.card)
+                this.world.globe.updateVisualization(this.id)
             }
         });
         this.card.setupState(hoveredStateAttributes);
@@ -187,9 +189,30 @@ export default class ConjunctionCard {
         this.card.active = isActive;
         if (isActive) {
             this.card.setState('selected');
+            if (this.manoeuvresMenu != null) {
+                console.log(this.manoeuvresMenu)
+                console.log("já existe um manoeuvreMenu desta conjunsão")
+                console.log("-------------------")
+                console.log("                   ")
+            } else {
+                this.setManoeuvresMenu()
+            }
         } else {
             this.card.setState('idle');
+            if (this.manoeuvresMenu) {
+                this.manoeuvresMenu.destroy()
+                this.manoeuvresMenu = null
+            }
         }
+    }
+
+    setManoeuvresMenu() {
+        this.manoeuvresMenu = new Panel("Manoeuvres", "manoeuvreCard", this.cardInfo.manoeuvres.length)
+        this.manoeuvresMenu.mesh.position.set(1.4, 1.6, -1.2);
+        this.manoeuvresMenu.mesh.rotation.y = -0.25;
+        this.manoeuvresMenu.mesh.scale.set(0.5, 0.5, 0.5)
+        this.manoeuvresMenu.setHeader()
+        this.manoeuvresMenu.setGrid(this.cardInfo.manoeuvres, 7)
     }
 
     destroy() {

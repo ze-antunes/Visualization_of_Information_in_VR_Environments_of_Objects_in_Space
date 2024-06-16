@@ -42,8 +42,8 @@ export default class Panel {
         this.header = new Header(this.mesh, this.title, this.cardType)
     }
 
-    setGrid(numbCards) {
-        this.grid = new Grid(this.mesh, this.cardType, this.maxCardsLength, numbCards)
+    setGrid(data, numbCards) {
+        this.grid = new Grid(this.mesh, data, this.cardType, this.maxCardsLength, numbCards, this)
     }
 
     setViews() {
@@ -58,5 +58,53 @@ export default class Panel {
     show() {
         this.mesh.scale.set(0.5, 0.5, 0.5)
         this.isOpen = true
+    }
+
+    // New destroy method
+    destroy() {
+        // console.log("Panel destroy")
+        // Remove the mesh from the scene
+        this.scene.remove(this.mesh);
+
+        // Dispose of ThreeMeshUI blocks, geometries, and materials
+        this.disposeMeshUI(this.mesh);
+
+        if (this.grid)
+            this.grid.destroy()
+        if (this.header)
+            this.header.destroy()
+
+        // Set references to null
+        this.mesh = null;
+        this.header = null;
+        this.grid = null;
+        this.views = null;
+    }
+
+    disposeMeshUI(block) {
+        if (block) {
+            // Recursively dispose children
+            if (block.children) {
+                for (let i = 0; i < block.children.length; i++) {
+                    this.disposeMeshUI(block.children[i]);
+                }
+            }
+
+            // Dispose of the block itself
+            if (block.geometry) {
+                block.geometry.dispose();
+            }
+            if (block.material) {
+                // If material is an array, dispose each material
+                if (Array.isArray(block.material)) {
+                    block.material.forEach((material) => material.dispose());
+                } else {
+                    block.material.dispose();
+                }
+            }
+            if (block.texture) {
+                block.texture.dispose();
+            }
+        }
     }
 }

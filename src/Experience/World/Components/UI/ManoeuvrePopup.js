@@ -215,4 +215,49 @@ export default class ManoeuvrePopup {
         this.mesh.scale.set(0.5, 0.5, 0.5)
         this.isOpen = true
     }
+
+    destroy() {
+        // Dispose of ThreeMeshUI blocks, geometries, and materials
+        this.disposeMeshUI(this.mesh);
+
+        // Remove the mesh from the scene
+        this.scene.remove(this.mesh);
+
+        // Clear references
+        this.mesh = null;
+        this.header = null;
+        this.main = null;
+        this.tcaBlock = null;
+        this.typeBlock = null;
+        this.durationBlock = null;
+        this.pocBlock = null;
+        this.missDistanceBlock = null;
+    }
+
+    disposeMeshUI(block) {
+        if (block) {
+            // Recursively dispose children
+            if (block.children) {
+                block.children.forEach(child => {
+                    this.disposeMeshUI(child);
+                });
+            }
+
+            // Dispose of the block itself
+            if (block.geometry) {
+                block.geometry.dispose();
+            }
+            if (block.material) {
+                // If material is an array, dispose each material
+                if (Array.isArray(block.material)) {
+                    block.material.forEach(material => material.dispose());
+                } else {
+                    block.material.dispose();
+                }
+            }
+            if (block.texture) {
+                block.texture.dispose();
+            }
+        }
+    }
 }

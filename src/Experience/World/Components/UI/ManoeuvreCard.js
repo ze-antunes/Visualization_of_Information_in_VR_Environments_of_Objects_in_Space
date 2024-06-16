@@ -5,7 +5,7 @@ import ManoeuvrePopup from './ManoeuvrePopup'
 import Panel from './Panel'
 
 export default class ManoeuvreCard {
-    constructor(grid, cardInfo, id) {
+    constructor(grid, cardInfo, id, panel) {
         this.experience = new Experience()
         this.time = this.experience.time
         this.resources = this.experience.resources
@@ -14,6 +14,7 @@ export default class ManoeuvreCard {
         this.grid = grid
         this.cardInfo = cardInfo
         this.id = id
+        this.panel = panel
         this.objsToTest = this.experience.raycaster.objsToTest
 
         this.setTextures()
@@ -76,8 +77,8 @@ export default class ManoeuvreCard {
             state: 'selected',
             attributes: selectedAttributes,
             onSet: () => {
-                this.experience.world.manoeuvresMenu.grid.setActiveCard(this)
-                // console.log(this.card)
+                if (this.panel.grid)
+                    this.panel.grid.setActiveCard(this)
             }
         });
         this.card.setupState(hoveredStateAttributes);
@@ -239,4 +240,66 @@ export default class ManoeuvreCard {
     setManoeuvrePopup() {
         this.popup = new ManoeuvrePopup(this.cardInfo)
     }
+
+    // New destroy method
+    destroy() {
+        // console.log("ManoeuvreCard destroy")
+        // Remove the card from the grid and objsToTest
+        const index = this.grid.children.indexOf(this.card);
+        if (index !== -1) {
+            this.grid.children.splice(index, 1);
+        }
+
+        const testIndex = this.objsToTest.indexOf(this.card);
+        if (testIndex !== -1) {
+            this.objsToTest.splice(testIndex, 1);
+        }
+
+        // Dispose of ThreeMeshUI blocks, geometries, and materials
+        this.disposeMeshUI(this.card);
+
+        // Destroy the popup
+        if (this.popup) {
+            this.popup.destroy();
+        }
+
+        // Set references to null
+        this.card = null;
+        this.popup = null;
+        this.textures = null;
+    }
+
+    disposeMeshUI(block) {
+        if (block) {
+            // Recursively dispose children
+            if (block.children) {
+                for (let i = 0; i < block.children.length; i++) {
+                    this.disposeMeshUI(block.children[i]);
+                }
+            }
+
+            // Dispose of the block itself
+            if (block.geometry) {
+                block.geometry.dispose();
+            }
+            if (block.material) {
+                // If material is an array, dispose each material
+                if (Array.isArray(block.material)) {
+                    block.material.forEach((material) => material.dispose());
+                } else {
+                    block.material.dispose();
+                }
+            }
+            if (block.texture) {
+                block.texture.dispose();
+            }
+        }
+    }
 }
+
+
+
+
+
+
+

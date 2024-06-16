@@ -14,8 +14,11 @@ export default class Globe {
         this.scene = this.experience.scene
         this.time = this.experience.time
         this.resources = this.experience.resources
+        this.data = this.experience.data
         this.debug = this.experience.debug
         this.globeView = this.experience.globeView
+
+        // console.log(this.data)
 
         // Debug
         if (this.debug.active) {
@@ -162,11 +165,73 @@ export default class Globe {
 
     update() {
         this.sun.updateSun()
-        this.earth.rotation.y = this.time.elapsed * 0.0001
-        if (this.target)
-            this.target.update()
-        if (this.chaser)
-            this.chaser.update()
+
+        const secondsInADay = 86400; // Number of seconds in a day
+        const rotationAnglePerSecond = (2 * Math.PI) / secondsInADay; // Full rotation (2π radians) per day
+
+        const now = Date.now(); // Current time in milliseconds since Unix epoch
+        const referenceTime = new Date('2024-01-01T00:00:00Z').getTime(); // Reference time in milliseconds
+
+        const elapsedTime = (now - referenceTime) / 1000; // Elapsed time in seconds
+
+        this.earth.rotation.y = elapsedTime * rotationAnglePerSecond;
+
+        // Update target and chaser objects
+        // if (this.target) this.target.update();
+        // if (this.chaser) this.chaser.update();
+    }
+
+    updateVisualization(conjunction) {
+        let dataToDisplay = this.data.conjunctions[conjunction]
+        // console.log(dataToDisplay)
+        // Information about the target and chaser space objects
+        let target = dataToDisplay.target;
+        let chaser = dataToDisplay.chaser;
+
+        // State vectors for target and chaser
+        let targetStateVector = dataToDisplay.details.target.state_vector;
+        let chaserStateVector = dataToDisplay.details.chaser.state_vector;
+
+        // Create position vectors for target and chaser
+        let targetPosition = new THREE.Vector3(targetStateVector.x, targetStateVector.y, targetStateVector.z);
+        let chaserPosition = new THREE.Vector3(chaserStateVector.x, chaserStateVector.y, chaserStateVector.z);
+
+        let a = targetStateVector.x - chaserStateVector.x;
+        let b = targetStateVector.y - chaserStateVector.y;
+        let c = targetStateVector.z - chaserStateVector.z;
+
+        let distance = Math.sqrt(a * a + b * b + c * c);
+
+        // console.log("distance: ", distance)
+
+        // Scale the positions to fit the 1 unit radius Earth model (2 unit diameter model)
+        let scaledTargetPosition = this.scaleCoordinatesToModel([targetStateVector])[0];
+        let scaledChaserPosition = this.scaleCoordinatesToModel([chaserStateVector])[0];
+
+        if (this.target && this.chaser) {
+            this.target.model.position.set(scaledTargetPosition.x, scaledTargetPosition.y, scaledTargetPosition.z)
+            this.chaser.model.position.set(scaledChaserPosition.x, scaledChaserPosition.y, scaledChaserPosition.z)
+            this.target.covarianceData = dataToDisplay.details.target.covariance
+            this.chaser.covarianceData = dataToDisplay.details.chaser.covariance
+        }
+    }
+
+    scaleCoordinatesToModel(positions) {
+        // Define scaling factor based on real-life dimensions
+        const realLifeDiameter = 12742000;
+        const modelDiameter = 2;
+        const scalingFactor = modelDiameter / realLifeDiameter;
+
+        // Scale and convert positions
+        let scaledPositions = positions.map(position => {
+            return {
+                x: position.x * scalingFactor,
+                y: position.y * scalingFactor,
+                z: position.z * scalingFactor
+            };
+        });
+
+        return scaledPositions;
     }
 
     show() {

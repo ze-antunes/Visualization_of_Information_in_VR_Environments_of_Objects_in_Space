@@ -131,4 +131,51 @@ export default class Pages {
         this.panel.add(buttons)
         this.objsToTest.push(this.buttonNext, this.buttonPrevious)
     }
+
+    destroy() {
+        // Remove from raycaster objects to test
+        this.objsToTest = this.objsToTest.filter(obj => obj !== this.buttonNext && obj !== this.buttonPrevious);
+
+        // Remove buttons from panel
+        if (this.panel && this.buttons) {
+            this.panel.remove(this.buttons);
+        }
+
+        // Dispose buttons and pages
+        [this.buttonNext, this.buttonPrevious, this.pages].forEach(block => {
+            if (block && block.children) {
+                block.children.forEach(child => {
+                    if (child.material) {
+                        child.material.dispose();
+                    }
+                    if (child.geometry) {
+                        child.geometry.dispose();
+                    }
+                    block.remove(child);
+                });
+            }
+        });
+
+        // Dispose textures
+        if (this.textures) {
+            Object.values(this.textures).forEach(texture => {
+                if (texture && texture.dispose) {
+                    texture.dispose();
+                }
+            });
+        }
+
+        // Nullify references
+        this.buttons = null;
+        this.buttonNext = null;
+        this.buttonPrevious = null;
+        this.pages = null;
+        this.panel = null;
+        this.textures = null;
+        this.experience = null;
+        this.scene = null;
+        this.time = null;
+        this.resources = null;
+        this.debug = null;
+    }
 }

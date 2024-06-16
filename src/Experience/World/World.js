@@ -15,11 +15,13 @@ export default class World {
         this.vr = this.experience.vr
         this.aframeScene = this.experience.aframeScene
         this.resources = this.experience.resources
-        this.data = this.experience.data
         this.globeView = this.experience.globeView
         this.roomView = this.experience.roomView
         this.rightHand = this.experience.rightHand
         this.leftHand = this.experience.leftHand
+        this.currentConjunctionIndex = 0;
+        this.conjunctions = [];
+        this.data = this.experience.data
 
         // console.log(this.data)
 
@@ -32,9 +34,10 @@ export default class World {
             this.globe = new Globe()
             this.room = new Room()
             this.setConjunctionsMenu()
-            this.setManoeuvresMenu()
             this.environment = new Environment()
-            console.log(this.renderer.renderer.info)
+            this.conjunctions.push(...Object.keys(this.data.conjunctions)); // Get the list of conjunctions
+            // console.log(this.conjunctions[this.currentConjunctionIndex])
+            this.globe.updateVisualization(this.conjunctions[this.currentConjunctionIndex]);
         })
     }
 
@@ -46,34 +49,8 @@ export default class World {
         // this.conjunctionsMenu.mesh.scale.set(0.1, 0.1, 0.1)
         this.conjunctionsMenu.mesh.scale.set(0.5, 0.5, 0.5)
         this.conjunctionsMenu.setHeader()
-        this.conjunctionsMenu.setGrid(4)
+        this.conjunctionsMenu.setGrid(this.data.conjunctions, 4)
         this.conjunctionsMenu.setViews()
-        // this.conjunctionsMenu.hide()
-
-        // this.leftHand.addEventListener('ybuttondown', function (e) {
-        //     this.conjunctionsMenu.hide()
-        //     // this.manoeuvresMenu.hide()
-        //     // console.log("hide")
-        // })
-
-        // this.leftHand.addEventListener('xbuttondown', function (e) {
-        //     this.conjunctionsMenu.show()
-        //     // this.manoeuvresMenu.show()
-        //     // console.log("show")
-        // })
-    }
-
-    setManoeuvresMenu() {
-        // console.log(this.data.conjunctions[0].manoeuvres)
-        this.manoeuvresMenu = new Panel("Manoeuvres", "manoeuvreCard", this.data.conjunctions[0].manoeuvres.length)
-        // this.manoeuvresMenu.mesh.position.set(0, 1.6, -1);
-        this.manoeuvresMenu.mesh.position.set(1.4, 1.6, -1.2);
-        this.manoeuvresMenu.mesh.rotation.y = -0.25;
-        // this.manoeuvresMenu.mesh.scale.set(0.1, 0.1, 0.1)
-        this.manoeuvresMenu.mesh.scale.set(0.5, 0.5, 0.5)
-        this.manoeuvresMenu.setHeader()
-        this.manoeuvresMenu.setGrid(7)
-        // this.manoeuvresMenu.hide()
     }
 
     update() {
@@ -96,6 +73,5 @@ export default class World {
                 this.manoeuvresMenu.mesh.lookAt(this.camera.object3D.position.x, this.camera.object3D.position.y, this.camera.object3D.position.z)
             }
         }
-
     }
 }

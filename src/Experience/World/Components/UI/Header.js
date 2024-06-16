@@ -197,4 +197,58 @@ export default class Header {
             this.infoPopup = new ManoeuvreInfo()
         }
     }
+
+    destroy() {
+        // Remove infoPopup
+        if (this.infoPopup) {
+            this.infoPopup.hide();
+            this.infoPopup = null;
+        }
+
+        // Remove header from panel
+        if (this.panel && this.header) {
+            this.panel.remove(this.header);
+        }
+
+        // Remove blocks from scene and dispose them
+        if (this.header) {
+            this.header.children.forEach(child => {
+                if (child instanceof ThreeMeshUI.Block) {
+                    child.children.forEach(grandchild => {
+                        if (grandchild.material) {
+                            grandchild.material.dispose();
+                        }
+                        if (grandchild.geometry) {
+                            grandchild.geometry.dispose();
+                        }
+                        child.remove(grandchild);
+                    });
+                }
+                this.header.remove(child);
+            });
+        }
+
+        // Remove from raycaster objects to test
+        this.objsToTest = this.objsToTest.filter(obj => obj !== this.info && obj !== this.columns && obj !== this.search);
+
+        // Dispose textures
+        Object.values(this.textures).forEach(texture => {
+            if (texture && texture.dispose) {
+                texture.dispose();
+            }
+        });
+
+        // Nullify references
+        this.header = null;
+        this.info = null;
+        this.columns = null;
+        this.search = null;
+        this.panel = null;
+        this.textures = null;
+        this.experience = null;
+        this.scene = null;
+        this.time = null;
+        this.resources = null;
+        this.debug = null;
+    }
 }

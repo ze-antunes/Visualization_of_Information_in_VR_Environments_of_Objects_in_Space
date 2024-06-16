@@ -7,20 +7,21 @@ import Pages from "./Pages"
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 
 export default class Grid {
-    constructor(panel, cardType, maxCardsLength, numbCards) {
+    constructor(parentMesh, data, cardType, maxCardsLength, numbCards, parentPanel) {
         this.experience = new Experience()
         this.scene = this.experience.scene
         this.time = this.experience.time
         this.resources = this.experience.resources
         this.debug = this.experience.debug
-        this.data = this.experience.data
-
+        
         // Setup 
-        this.panel = panel
+        this.parentMesh = parentMesh
+        this.data = data
         this.cardType = cardType
         this.cardsCreated = 0
         this.maxCardsLength = maxCardsLength
         this.numbCards = numbCards
+        this.parentPanel = parentPanel
         this.startIndex = 0
         this.cards = []
 
@@ -37,7 +38,7 @@ export default class Grid {
             backgroundOpacity: 0
         });
 
-        this.panel.add(this.grid)
+        this.parentMesh.add(this.grid)
         this.setCards(this.startIndex)
         // console.log(this.grid.children.length)
         // console.log(this.grid.children)
@@ -47,9 +48,9 @@ export default class Grid {
         let id = 0;
         for (let i = startIndex; i < Math.min(startIndex + this.numbCards, this.maxCardsLength); i++) {
             if (this.cardType === 'manoeuvreCard') {
-                this.createCard(this.data.conjunctions[1].manoeuvres[i], id);
+                this.createCard(this.data[i], id);
             } else {
-                this.createCard(this.data.conjunctions[i], id);
+                this.createCard(this.data[i], id);
             }
             id++;
         }
@@ -57,14 +58,15 @@ export default class Grid {
     }
 
     setPages() {
-        this.pages = new Pages(this.panel, this.maxCardsLength, this.status, this)
+        this.pages = new Pages(this.parentMesh, this.maxCardsLength, this.status, this)
     }
 
     createCard(cardInfo, id) {
         if (this.cardType === 'conjunctionCard') {
-            this.card = new ConjunctionCard(this.grid, cardInfo, id)
+            this.card = new ConjunctionCard(this.grid, cardInfo, id, this.parentPanel)
         } else if (this.cardType === 'manoeuvreCard') {
-            this.card = new ManoeuvreCard(this.grid, cardInfo, id)
+            // console.log(this.panel)
+            this.card = new ManoeuvreCard(this.grid, cardInfo, id, this.parentPanel)
         }
         this.cards.push(this.card)
         this.cardsCreated++
@@ -103,6 +105,69 @@ export default class Grid {
         if (this.startIndex + this.numbCards >= this.maxCardsLength) {
             // nextButton.disabled = true;
             // console.log("nextButton.disabled = true")
+        }
+    }
+
+    destroy() {
+        // console.log("Grid destroy")
+
+        // Dispose of all cards
+        this.cards.forEach(card => {
+            if (card.destroy) {
+                card.destroy();
+            }
+        });
+
+        if (this.pages)
+            this.pages.destroy()
+
+        // Dispose of ThreeMeshUI blocks, geometries, and materials
+        this.disposeMeshUI(this.grid);
+
+        // Remove the grid from the panel
+        if (this.parentMesh.children) {
+            const index = this.parentMesh.children.indexOf(this.grid);
+            if (index !== -1) {
+                this.parentMesh.children.splice(index, 1);
+            }
+        }
+
+        // Dispose pages
+        if (this.pages && this.pages.destroy) {
+            this.pages.destroy();
+        }
+
+        // Clear references
+        this.cards = [];
+        this.grid = null;
+        this.parentMesh = null;
+        this.pages = null;
+    }
+
+    disposeMeshUI(block) {
+        if (block) {
+            // Recursively dispose children
+            if (block.children) {
+                block.children.forEach(child => {
+                    this.disposeMeshUI(child);
+                });
+            }
+
+            // Dispose of the block itself
+            if (block.geometry) {
+                block.geometry.dispose();
+            }
+            if (block.material) {
+                // If material is an array, dispose each material
+                if (Array.isArray(block.material)) {
+                    block.material.forEach(material => material.dispose());
+                } else {
+                    block.material.dispose();
+                }
+            }
+            if (block.texture) {
+                block.texture.dispose();
+            }
         }
     }
 }

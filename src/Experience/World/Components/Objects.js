@@ -2,7 +2,6 @@ import * as THREE from 'three'
 import Experience from '../../Experience'
 import Covariance from './Covariance'
 import Trajectory from './Trajectory'
-import ThreeMeshUI from 'three-mesh-ui'
 import ObjectPopup from './UI/ObjectPopup'
 
 export default class Objects {
@@ -11,6 +10,7 @@ export default class Objects {
         this.scene = this.experience.scene
         this.time = this.experience.time
         this.debug = this.experience.debug
+
 
         // Debug
         // if (this.debug.active) {
@@ -28,11 +28,15 @@ export default class Objects {
         this.velocity = velocity
         this.objsToTest = this.experience.raycaster.objsToTest
         this.isPopupOpen = false
+        if (this.type === "target")
+            this.covarianceData = this.experience.data.conjunctions[0].details.target.covariance
+        else
+            this.covarianceData = this.experience.data.conjunctions[0].details.chaser.covariance
 
         this.setModel()
 
         if (this.model && this.modelParameters) {
-            this.covariance = new Covariance(this.model, this.modelParameters, this.type)
+            this.covariance = new Covariance(this.model, this.modelParameters, this.type, this.covarianceData)
             this.trajectory = new Trajectory(this.model, this.modelParameters)
         }
     }
@@ -45,6 +49,7 @@ export default class Objects {
         this.modelParameters.trajectoryRadius = this.radius
         this.modelParameters.color = this.color
         this.modelParameters.velocity = this.velocity
+
         if (this.type === "target")
             this.model.scale.set(0.05, 0.05, 0.05)
         else
@@ -84,5 +89,10 @@ export default class Objects {
         this.model.position.y = Math.sin(this.model.thetaAngle) * Math.sin(this.modelParameters.trajectoryPhiAngle) * this.modelParameters.trajectoryRadius
         this.model.position.z = Math.sin(this.model.thetaAngle) * Math.cos(this.modelParameters.trajectoryPhiAngle) * this.modelParameters.trajectoryRadius
         this.popup.update()
+    }
+
+    scaleObjectByMass(object) {
+        const scaleFactor = object.userData.mass; // Adjust as needed
+        object.scale.set(scaleFactor, scaleFactor, scaleFactor);
     }
 }

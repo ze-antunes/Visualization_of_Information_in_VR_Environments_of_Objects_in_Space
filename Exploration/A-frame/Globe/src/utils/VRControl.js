@@ -7,26 +7,26 @@ import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerM
 
 export default function VRControl( renderer ) {
 
-	const controllers = [];
-	const controllerGrips = [];
+	let controllers = [];
+	let controllerGrips = [];
 
-	const controllerModelFactory = new XRControllerModelFactory();
+	let controllerModelFactory = new XRControllerModelFactory();
 
 	//////////////////
 	// Lines helpers
 	//////////////////
 
-	const material = new THREE.MeshBasicMaterial( {
+	let material = new THREE.MeshBasicMaterial( {
 		color: 0xffffff,
 		alphaMap: new THREE.Texture( generateRayTexture() ),
 		transparent: true
 	} );
 
-	const geometry = new THREE.BoxGeometry( 0.004, 0.004, 0.35 );
+	let geometry = new THREE.BoxGeometry( 0.004, 0.004, 0.35 );
 
 	geometry.translate( 0, 0, -0.15 );
 
-	const uvAttribute = geometry.attributes.uv;
+	let uvAttribute = geometry.attributes.uv;
 
 	for ( let i = 0; i < uvAttribute.count; i++ ) {
 
@@ -80,20 +80,20 @@ export default function VRControl( renderer ) {
 
 	}
 
-	const linesHelper = new THREE.Mesh( geometry, material );
+	let linesHelper = new THREE.Mesh( geometry, material );
 	linesHelper.renderOrder = Infinity;
 
 	/////////////////
 	// Point helper
 	/////////////////
 
-	const spriteMaterial = new THREE.SpriteMaterial( {
+	let spriteMaterial = new THREE.SpriteMaterial( {
 		map: new THREE.CanvasTexture( generatePointerTexture() ),
 		sizeAttenuation: false,
 		depthTest: false
 	} );
 
-	const pointer = new THREE.Sprite( spriteMaterial );
+	let pointer = new THREE.Sprite( spriteMaterial );
 
 	pointer.scale.set( 0.015, 0.015, 1 );
 	pointer.renderOrder = Infinity;
@@ -102,14 +102,14 @@ export default function VRControl( renderer ) {
 	// Controllers
 	////////////////
 
-	const controller1 = renderer.xr.getController( 0 );
-	const controller2 = renderer.xr.getController( 1 );
+	let controller1 = renderer.xr.getController( 0 );
+	let controller2 = renderer.xr.getController( 1 );
 
 	controller1.name = 'controller-right';
 	controller2.name = 'controller-left';
 
-	const controllerGrip1 = renderer.xr.getControllerGrip( 0 );
-	const controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+	let controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+	let controllerGrip2 = renderer.xr.getControllerGrip( 1 );
 
 	if ( controller1 ) controllers.push( controller1 );
 	if ( controller2 ) controllers.push( controller2 );
@@ -119,8 +119,8 @@ export default function VRControl( renderer ) {
 
 	controllers.forEach( ( controller ) => {
 
-		const ray = linesHelper.clone();
-		const point = pointer.clone();
+		let ray = linesHelper.clone();
+		let point = pointer.clone();
 
 		controller.add( ray, point );
 		controller.ray = ray;
@@ -138,13 +138,13 @@ export default function VRControl( renderer ) {
 	// Functions
 	//////////////
 
-	const dummyMatrix = new THREE.Matrix4();
+	let dummyMatrix = new THREE.Matrix4();
 
 	// Set the passed ray to match the given controller pointing direction
 
 	function setFromController( controllerID, ray ) {
 
-		const controller = controllers[ controllerID ];
+		let controller = controllers[ controllerID ];
 
 		// Position the intersection ray
 
@@ -160,8 +160,8 @@ export default function VRControl( renderer ) {
 
 	function setPointerAt( controllerID, vec ) {
 
-		const controller = controllers[ controllerID ];
-		const localVec = controller.worldToLocal( vec );
+		let controller = controllers[ controllerID ];
+		let localVec = controller.worldToLocal( vec );
 
 		controller.point.position.copy( localVec );
 		controller.point.visible = true;
@@ -187,13 +187,13 @@ export default function VRControl( renderer ) {
 
 function generateRayTexture() {
 
-	const canvas = document.createElement( 'canvas' );
+	let canvas = document.createElement( 'canvas' );
 	canvas.width = 64;
 	canvas.height = 64;
 
-	const ctx = canvas.getContext( '2d' );
+	let ctx = canvas.getContext( '2d' );
 
-	const gradient = ctx.createLinearGradient( 0, 0, 64, 0 );
+	let gradient = ctx.createLinearGradient( 0, 0, 64, 0 );
 	gradient.addColorStop( 0, 'black' );
 	gradient.addColorStop( 1, 'white' );
 
@@ -208,11 +208,11 @@ function generateRayTexture() {
 
 function generatePointerTexture() {
 
-	const canvas = document.createElement( 'canvas' );
+	let canvas = document.createElement( 'canvas' );
 	canvas.width = 64;
 	canvas.height = 64;
 
-	const ctx = canvas.getContext( '2d' );
+	let ctx = canvas.getContext( '2d' );
 
 	ctx.beginPath();
 	ctx.arc( 32, 32, 29, 0, 2 * Math.PI );

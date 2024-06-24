@@ -21,42 +21,43 @@ export default class Covariance {
 
     setCovariance() {
         // Define the covariance matrix P (ensure it is a square 3x3 matrix)
-        const P = [
+        let P = [
             [this.data.cr_r, this.data.ct_r, this.data.cn_r],
             [this.data.ct_r, this.data.ct_t, this.data.cn_t],
             [this.data.cn_r, this.data.cn_t, this.data.cn_n]
         ];
 
         // Perform eigenvalue decomposition
-        const eigResult = MATHJS.eigs(P);
-        const eigenvalues = eigResult.values;
-        const eigenvectors = eigResult.eigenvectors;
+        let eigResult = MATHJS.eigs(P);
+        let eigenvalues = eigResult.values;
+        let eigenvectors = eigResult.eigenvectors;
 
         // Calculate the lengths of the semi-axes
-        const semiAxesLengths = eigenvalues.map(Math.sqrt);
+        let semiAxesLengths = eigenvalues.map(Math.sqrt);
         // console.log(P)
 
         // Create the ellipsoid
-        const ellipsoidGeometry = new THREE.SphereGeometry(1, 32, 32);
-        // const ellipsoidMaterial = new THREE.MeshPhongMaterial({ color: 0x00ffff, wireframe: false });
-        const ellipsoidMaterial = new THREE.MeshStandardMaterial({
+        let ellipsoidGeometry = new THREE.SphereGeometry(1, 32, 32);
+        // let ellipsoidMaterial = new THREE.MeshPhongMaterial({ color: 0x00ffff, wireframe: false });
+        let ellipsoidMaterial = new THREE.MeshStandardMaterial({
             color: this.objectParameters.color,
             transparent: true,
             opacity: 0.2,
             side: THREE.DoubleSide
         });
-        const ellipsoid = new THREE.Mesh(ellipsoidGeometry, ellipsoidMaterial);
+        let ellipsoid = new THREE.Mesh(ellipsoidGeometry, ellipsoidMaterial);
         ellipsoid.position.set(0, 0, 0)
 
         // Scale the ellipsoid
         // Desired model size (2 meters)
-        const scaledSemiAxesLengths = this.scaleToModel(semiAxesLengths, this.modelSize);
+        let scaledSemiAxesLengths = this.scaleToModel(semiAxesLengths, this.modelSize);
         // console.log('Scaled Semi-Axes Lengths:', scaledSemiAxesLengths);
         // ellipsoid.scale.set(scaledSemiAxesLengths[0], scaledSemiAxesLengths[1], scaledSemiAxesLengths[2]);
         ellipsoid.scale.set(semiAxesLengths[0] * 0.01, semiAxesLengths[1] * 0.01, semiAxesLengths[2] * 0.0001);
+        // ellipsoid.scale.set(semiAxesLengths[0], semiAxesLengths[1], semiAxesLengths[2]);
  
         // Apply rotation to align with eigenvectors
-        const rotationMatrix = new THREE.Matrix4();
+        let rotationMatrix = new THREE.Matrix4();
         rotationMatrix.set(
             eigenvectors[0].vector[0], eigenvectors[0].vector[1], eigenvectors[0].vector[2], 0,
             eigenvectors[1].vector[0], eigenvectors[1].vector[1], eigenvectors[1].vector[2], 0,
@@ -92,8 +93,8 @@ export default class Covariance {
     }
 
     scaleToModel(semiAxesLengths, modelSize) {
-        const maxSemiAxisLength = Math.max(...semiAxesLengths);
-        const scaleFactor = modelSize / maxSemiAxisLength;
+        let maxSemiAxisLength = Math.max(...semiAxesLengths);
+        let scaleFactor = modelSize / maxSemiAxisLength;
         return semiAxesLengths.map(length => length * scaleFactor);
     }
 }

@@ -189,19 +189,19 @@ export default class ManoeuvrePopup {
     }
 
     setValueTCA(isoDateString) {
-        const date = new Date(isoDateString);
+        let date = new Date(isoDateString);
 
-        const monthNames = [
+        let monthNames = [
             "Jan", "Feb", "Mar", "Apr", "May", "Jun",
             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
         ];
 
-        const month = monthNames[date.getUTCMonth()];
-        const day = date.getUTCDate();
-        const year = date.getUTCFullYear();
-        const hours = String(date.getUTCHours()).padStart(2, '0');
-        const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(date.getUTCSeconds()).padStart(2, '0');
+        let month = monthNames[date.getUTCMonth()];
+        let day = date.getUTCDate();
+        let year = date.getUTCFullYear();
+        let hours = String(date.getUTCHours()).padStart(2, '0');
+        let minutes = String(date.getUTCMinutes()).padStart(2, '0');
+        let seconds = String(date.getUTCSeconds()).padStart(2, '0');
 
         return `${month} ${day} ${year} ${hours}:${minutes}:${seconds} UTC`;
     }

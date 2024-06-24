@@ -52,46 +52,44 @@ export default class Raycaster {
     }
 
     setInstance() {
-        setTimeout(() => {
-            this.renderer = this.aframeScene.renderer
-            this.camera = this.aframeScene.camera
-            
-            // console.log(this.experience.scene)
-            vrControl = vrControl(this.renderer, this.camera, this.scene);
+        this.renderer = this.aframeScene.renderer
+        this.camera = this.aframeScene.camera
 
-            this.scene.add(vrControl.controllerGrips[0], vrControl.controllers[0], vrControl.controllerGrips[1], vrControl.controllers[1]);
+        // console.log(this.experience.scene)
+        vrControl = vrControl(this.renderer, this.camera, this.scene);
 
-            vrControl.controllers[0].addEventListener('selectstart', () => {
+        this.scene.add(vrControl.controllerGrips[0], vrControl.controllers[0], vrControl.controllerGrips[1], vrControl.controllers[1]);
 
-                selectState = true;
+        vrControl.controllers[0].addEventListener('selectstart', () => {
 
-            });
-            vrControl.controllers[0].addEventListener('selectend', () => {
+            selectState = true;
 
-                selectState = false;
+        });
+        vrControl.controllers[0].addEventListener('selectend', () => {
 
-            });
+            selectState = false;
 
-            // vrControl.controllers[1].addEventListener('selectstart', () => {
+        });
 
-            //     selectState = true;
+        // vrControl.controllers[1].addEventListener('selectstart', () => {
 
-            // });
-            // vrControl.controllers[1].addEventListener('selectend', () => {
+        //     selectState = true;
 
-            //     selectState = false;
+        // });
+        // vrControl.controllers[1].addEventListener('selectend', () => {
 
-            // });
+        //     selectState = false;
 
-            // Access the raycaster component
-            let raycasterComponent = this.rightHand.components.raycaster
-            // console.log(this.rightHand.components.raycaster)
+        // });
 
-            this.raycaster = new THREE.Raycaster();
-            this.raycaster = raycasterComponent.raycaster;
+        // Access the raycaster component
+        let raycasterComponent = this.rightHand.components.raycaster
+        // console.log(this.rightHand.components.raycaster)
 
-            // this.update()
-        }, 100)
+        this.raycaster = new THREE.Raycaster();
+        this.raycaster = raycasterComponent.raycaster;
+
+        // this.update()
 
     }
 

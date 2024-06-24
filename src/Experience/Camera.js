@@ -14,9 +14,6 @@ export default class Camera {
     setInstance() {
         // Camera
         // Access the underlying Three.js camera object
-        
-        setTimeout(() => {
-            this.camera = this.aframeScene.camera
-        }, 1)
+        this.camera = this.aframeScene.camera
     }
 }

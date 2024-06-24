@@ -16,7 +16,8 @@
   <body>
     <a-scene
       id="myScene"
-      light="defaultLightsEnabled: true"
+      light="defaultLightsEnabled: true"        
+      renderer="antialias: true"
     >
       <a-box
         id="collisionBox"
@@ -49,7 +50,6 @@
           raycaster="showLine: false; objects: #globe, #room, #collisionBox"
         ></a-entity>
         <a-entity
-          aframe-left-control
           id="leftController"
           oculus-touch-controls="hand: left"
           raycaster="showLine: false; objects: #globe, #room, #collisionBox"

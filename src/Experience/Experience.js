@@ -11,6 +11,8 @@ import sources from './sources'
 import Renderer from './Renderer'
 import World from './World/World'
 
+// console.log("THREE: ", THREE)
+
 let instance = null
 
 export default class Experience {
@@ -21,11 +23,9 @@ export default class Experience {
 
         instance = this
 
-
         //Global acess
         window.experience = this
 
-        
         // Setup 
         this.debug = new Debug()
         this.vr = window.location.hash == '#vr'
@@ -76,12 +76,14 @@ export default class Experience {
     update() {
         if (this.debug.active) {
             this.stats.begin()
-            this.world.update()
+            if (this.world)
+                this.world.update()
             ThreeMeshUI.update()
             this.raycaster.update()
             this.stats.end()
         } else {
-            this.world.update()
+            if (this.world)
+                this.world.update()
             ThreeMeshUI.update()
             this.raycaster.update()
         }

@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+// import * as THREE from 'three'
 import ThreeMeshUI, { update } from 'three-mesh-ui'
 import Experience from "../../../Experience"
 import ConjunctionInfo from './ConjunctionInfo'
@@ -20,7 +20,7 @@ export default class Header {
 
         this.setTextures()
         this.setMesh()
-        this.setInfoPopup()
+        // this.setInfoPopup()
     }
 
     setTextures() {
@@ -187,9 +187,6 @@ export default class Header {
         this.header.add(title, options)
         this.panel.add(this.header)
 
-    }
-
-    setInfoPopup() {
         if (this.title === 'Conjunctions') {
             this.infoPopup = new ConjunctionInfo()
         }
@@ -202,7 +199,7 @@ export default class Header {
         // Remove infoPopup
         if (this.infoPopup) {
             this.infoPopup.hide();
-            this.infoPopup = null;
+            // this.infoPopup = null;
         }
 
         // Remove header from panel

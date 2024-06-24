@@ -200,9 +200,9 @@ export default class ManoeuvreCard {
     }
 
     setValueTCA(isoDateString) {
-        const date = new Date(isoDateString);
+        let date = new Date(isoDateString);
 
-        const options = {
+        let options = {
             month: 'short',
             day: '2-digit',
             hour: '2-digit',
@@ -211,11 +211,11 @@ export default class ManoeuvreCard {
         };
 
         // Extract parts
-        const formattedDate = date.toLocaleDateString('en-US', options).replace(',', '');
-        const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+        let formattedDate = date.toLocaleDateString('en-US', options).replace(',', '');
+        let time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
 
         // Combine parts into desired format
-        const [monthDay, timePart] = formattedDate.split(' ');
+        let [monthDay, timePart] = formattedDate.split(' ');
 
         return `${monthDay} ${timePart}, ${time}`;
     }
@@ -245,12 +245,12 @@ export default class ManoeuvreCard {
     destroy() {
         // console.log("ManoeuvreCard destroy")
         // Remove the card from the grid and objsToTest
-        const index = this.grid.children.indexOf(this.card);
+        let index = this.grid.children.indexOf(this.card);
         if (index !== -1) {
             this.grid.children.splice(index, 1);
         }
 
-        const testIndex = this.objsToTest.indexOf(this.card);
+        let testIndex = this.objsToTest.indexOf(this.card);
         if (testIndex !== -1) {
             this.objsToTest.splice(testIndex, 1);
         }

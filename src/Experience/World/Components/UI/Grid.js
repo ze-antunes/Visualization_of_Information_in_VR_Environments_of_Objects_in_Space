@@ -6,7 +6,7 @@ import ManoeuvreCard from './ManoeuvreCard'
 import Pages from "./Pages"
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 
-export default class Grid {
+export default class Grid { 
     constructor(parentMesh, data, cardType, maxCardsLength, numbCards, parentPanel) {
         this.experience = new Experience()
         this.scene = this.experience.scene
@@ -117,6 +117,7 @@ export default class Grid {
                 card.destroy();
             }
         });
+        
 
         if (this.pages)
             this.pages.destroy()
@@ -126,7 +127,7 @@ export default class Grid {
 
         // Remove the grid from the panel
         if (this.parentMesh.children) {
-            const index = this.parentMesh.children.indexOf(this.grid);
+            let index = this.parentMesh.children.indexOf(this.grid);
             if (index !== -1) {
                 this.parentMesh.children.splice(index, 1);
             }

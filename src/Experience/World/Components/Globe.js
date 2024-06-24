@@ -1,4 +1,4 @@
-// import * as THREE from 'three'
+import * as THREE from 'three'
 import Experience from '../../Experience'
 import Objects from './Objects'
 import gsap from 'gsap'
@@ -61,7 +61,6 @@ export default class Globe {
         this.earthParameters.atmosphereTwilightColor = '#ffbc8f'
 
         this.earthMaterial = new THREE.ShaderMaterial({
-            precission: "lowp",
             vertexShader: earthVertexShader,
             fragmentShader: earthFragmentShader,
             uniforms:
@@ -76,7 +75,6 @@ export default class Globe {
         })
 
         this.atmosphereMaterial = new THREE.ShaderMaterial({
-            precission: "lowp",
             vertexShader: atmosphereVertexShader,
             fragmentShader: atmosphereFragmentShader,
             uniforms:
@@ -166,13 +164,13 @@ export default class Globe {
     update() {
         this.sun.updateSun()
 
-        const secondsInADay = 86400; // Number of seconds in a day
-        const rotationAnglePerSecond = (2 * Math.PI) / secondsInADay; // Full rotation (2π radians) per day
+        let secondsInADay = 86400; // Number of seconds in a day
+        let rotationAnglePerSecond = (2 * Math.PI) / secondsInADay; // Full rotation (2π radians) per day
 
-        const now = Date.now(); // Current time in milliseconds since Unix epoch
-        const referenceTime = new Date('2024-01-01T00:00:00Z').getTime(); // Reference time in milliseconds
+        let now = Date.now(); // Current time in milliseconds since Unix epoch
+        let referenceTime = new Date('2024-01-01T00:00:00Z').getTime(); // Reference time in milliseconds
 
-        const elapsedTime = (now - referenceTime) / 1000; // Elapsed time in seconds
+        let elapsedTime = (now - referenceTime) / 1000; // Elapsed time in seconds
 
         this.earth.rotation.y = elapsedTime * rotationAnglePerSecond;
 
@@ -196,6 +194,10 @@ export default class Globe {
         let targetPosition = new THREE.Vector3(targetStateVector.x, targetStateVector.y, targetStateVector.z);
         let chaserPosition = new THREE.Vector3(chaserStateVector.x, chaserStateVector.y, chaserStateVector.z);
 
+        // Globe Entity rotation
+        let testeCalculateRotationAngle = this.calculateRotationAngle(targetStateVector.z, targetStateVector.x)
+        gsap.to(this.globeView.rotation, 1, { y: THREE.MathUtils.degToRad(testeCalculateRotationAngle), ease: "easeInOut" })
+
         let a = targetStateVector.x - chaserStateVector.x;
         let b = targetStateVector.y - chaserStateVector.y;
         let c = targetStateVector.z - chaserStateVector.z;
@@ -209,8 +211,8 @@ export default class Globe {
         let scaledChaserPosition = this.scaleCoordinatesToModel([chaserStateVector])[0];
 
         if (this.target && this.chaser) {
-            this.target.model.position.set(scaledTargetPosition.x, scaledTargetPosition.y, scaledTargetPosition.z)
-            this.chaser.model.position.set(scaledChaserPosition.x, scaledChaserPosition.y, scaledChaserPosition.z)
+            gsap.to(this.target.model.position, 1, { x: scaledTargetPosition.x, y: scaledTargetPosition.y, z: scaledTargetPosition.z, ease: "easeInOut" })
+            gsap.to(this.chaser.model.position, 1, { x: scaledTargetPosition.x, y: scaledTargetPosition.y, z: scaledTargetPosition.z, ease: "easeInOut" })
             this.target.covarianceData = dataToDisplay.details.target.covariance
             this.chaser.covarianceData = dataToDisplay.details.chaser.covariance
         }
@@ -218,9 +220,9 @@ export default class Globe {
 
     scaleCoordinatesToModel(positions) {
         // Define scaling factor based on real-life dimensions
-        const realLifeDiameter = 12742000;
-        const modelDiameter = 2;
-        const scalingFactor = modelDiameter / realLifeDiameter;
+        let realLifeDiameter = 12742000;
+        let modelDiameter = 2;
+        let scalingFactor = modelDiameter / realLifeDiameter;
 
         // Scale and convert positions
         let scaledPositions = positions.map(position => {
@@ -232,6 +234,21 @@ export default class Globe {
         });
 
         return scaledPositions;
+    }
+
+    calculateRotationAngle(x, y) {
+        // Calculate the angle in radians
+        let angleRad = Math.atan2(y, x);
+
+        // Convert the angle to degrees
+        let angleDeg = angleRad * (180 / Math.PI);
+
+        // Adjust the angle to make sure it is in the range [0, 360]
+        if (angleDeg < 0) {
+            angleDeg += 360;
+        }
+
+        return angleDeg;
     }
 
     show() {
@@ -249,5 +266,6 @@ export default class Globe {
         this.globeView.remove(this.earth)
         this.earth.geometry.dispose()
         this.earth.material.dispose()
+        this.earth = null
     }
 }

@@ -1,5 +1,5 @@
 // import * as THREE from 'three'
-import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js'
+// import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import Experience from "../Experience";
 import Globe from './Components/Globe';
 import Room from './Components/Room';
@@ -23,7 +23,8 @@ export default class World {
         this.conjunctions = [];
         this.data = this.experience.data
 
-        // console.log(this.data)
+        // Setup
+        this.conjunctionMenuOpen = true;
 
         // Wait for resources
         // when the resources are ready we can instanciate the environment
@@ -38,7 +39,48 @@ export default class World {
             this.conjunctions.push(...Object.keys(this.data.conjunctions)); // Get the list of conjunctions
             // console.log(this.conjunctions[this.currentConjunctionIndex])
             this.globe.updateVisualization(this.conjunctions[this.currentConjunctionIndex]);
+            this.room.updateVisualization(this.conjunctions[this.currentConjunctionIndex]);
         })
+
+        // Listen for buttondown event on the left hand controller
+        this.leftHand.addEventListener('buttondown', (e) => {
+            // console.log('Left hand button down:', e.detail);
+            if (e.detail.id == 5) {
+                if (this.conjunctionMenuOpen && this.conjunctionsMenu) {
+                    console.log('hide');
+                    this.conjunctionsMenu.hide()
+                }
+                else if (this.conjunctionMenuOpen == false && this.conjunctionsMenu) {
+                    console.log('show');
+                    this.conjunctionsMenu.show()
+                }
+
+                // Toggle open state
+                this.conjunctionMenuOpen = !this.conjunctionMenuOpen;
+            }
+        });
+
+        // // Initialize the value and the max value
+        // let intValue = 0;
+        // let maxValue = 4;
+
+        // document.addEventListener("keydown", function (e) {
+        //     if (e.key === "e") {
+        //         intValue = (intValue + 1) % (maxValue + 1);
+        //     }
+        //     if (e.key === "r") {
+        //         intValue = (intValue - 1 + (maxValue + 1)) % (maxValue + 1);
+        //     }
+        //     console.log(intValue)
+        // });
+
+        this.leftHand.addEventListener('axismove', (e) => {
+            console.log("logThumbstick", e.detail)
+            if (e.detail.y > 0.95) { console.log("DOWN"); }
+            if (e.detail.y < -0.95) { console.log("UP"); }
+            if (e.detail.x < -0.95) { console.log("LEFT"); }
+            if (e.detail.x > 0.95) { console.log("RIGHT"); }
+        });
     }
 
     setConjunctionsMenu() {

@@ -92,7 +92,7 @@ export default class Objects {
     }
 
     scaleObjectByMass(object) {
-        const scaleFactor = object.userData.mass; // Adjust as needed
+        let scaleFactor = object.userData.mass; // Adjust as needed
         object.scale.set(scaleFactor, scaleFactor, scaleFactor);
     }
 }

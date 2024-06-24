@@ -17,6 +17,7 @@ export default class ConjunctionCard {
         this.cardInfo = cardInfo
         this.id = id
         this.objsToTest = this.experience.raycaster.objsToTest
+        this.clicks = 0
         // this.geometries = []
 
         this.setTextures()
@@ -78,6 +79,7 @@ export default class ConjunctionCard {
             onSet: () => {
                 this.experience.world.conjunctionsMenu.grid.setActiveCard(this)
                 this.world.globe.updateVisualization(this.id)
+                this.world.room.updateVisualization(this.id)
             }
         });
         this.card.setupState(hoveredStateAttributes);
@@ -165,9 +167,9 @@ export default class ConjunctionCard {
     }
 
     setValueTCA(isoDateString) {
-        const date = new Date(isoDateString);
+        let date = new Date(isoDateString);
 
-        const options = {
+        let options = {
             month: 'short',
             day: '2-digit',
             hour: '2-digit',
@@ -176,11 +178,11 @@ export default class ConjunctionCard {
         };
 
         // Extract parts
-        const formattedDate = date.toLocaleDateString('en-US', options).replace(',', '');
-        const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+        let formattedDate = date.toLocaleDateString('en-US', options).replace(',', '');
+        let time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
 
         // Combine parts into desired format
-        const [monthDay, timePart] = formattedDate.split(' ');
+        let [monthDay, timePart] = formattedDate.split(' ');
 
         return `${monthDay} ${timePart}, ${time}`;
     }
@@ -190,13 +192,14 @@ export default class ConjunctionCard {
         if (isActive) {
             this.card.setState('selected');
             if (this.manoeuvresMenu != null) {
-                console.log(this.manoeuvresMenu)
-                console.log("já existe um manoeuvreMenu desta conjunsão")
-                console.log("-------------------")
-                console.log("                   ")
+                if (this.clicks % 2 == 0)
+                    this.manoeuvresMenu.show()
+                else
+                    this.manoeuvresMenu.hide()
             } else {
                 this.setManoeuvresMenu()
             }
+            this.clicks++;
         } else {
             this.card.setState('idle');
             if (this.manoeuvresMenu) {
@@ -234,8 +237,9 @@ export default class ConjunctionCard {
 
         // Remove the card from the grid and raycaster's test objects
         this.grid.remove(this.card);
+        this.card = null
 
-        const index = this.objsToTest.indexOf(this.card);
+        let index = this.objsToTest.indexOf(this.card);
         if (index > -1) {
             this.objsToTest.splice(index, 1);
         }

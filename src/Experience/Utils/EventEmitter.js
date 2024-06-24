@@ -17,12 +17,12 @@ export default class EventEmitter {
         }
 
         // Resolve names
-        const names = this.resolveNames(_names)
+        let names = this.resolveNames(_names)
 
         // Each name
         names.forEach((_name) => {
             // Resolve name
-            const name = this.resolveName(_name)
+            let name = this.resolveName(_name)
 
             // Create namespace if not exist
             if (!(this.callbacks[name.namespace] instanceof Object))
@@ -47,12 +47,12 @@ export default class EventEmitter {
         }
 
         // Resolve names
-        const names = this.resolveNames(_names)
+        let names = this.resolveNames(_names)
 
         // Each name
         names.forEach((_name) => {
             // Resolve name
-            const name = this.resolveName(_name)
+            let name = this.resolveName(_name)
 
             // Remove namespace
             if (name.namespace !== 'base' && name.value === '') {
@@ -64,7 +64,7 @@ export default class EventEmitter {
                 // Default
                 if (name.namespace === 'base') {
                     // Try to remove from each namespace
-                    for (const namespace in this.callbacks) {
+                    for (let namespace in this.callbacks) {
                         if (this.callbacks[namespace] instanceof Object && this.callbacks[namespace][name.value] instanceof Array) {
                             delete this.callbacks[namespace][name.value]
 
@@ -100,7 +100,7 @@ export default class EventEmitter {
         let result = null
 
         // Default args
-        const args = !(_args instanceof Array) ? [] : _args
+        let args = !(_args instanceof Array) ? [] : _args
 
         // Resolve names (should on have one event)
         let name = this.resolveNames(_name)
@@ -111,7 +111,7 @@ export default class EventEmitter {
         // Default namespace
         if (name.namespace === 'base') {
             // Try to find callback in each namespace
-            for (const namespace in this.callbacks) {
+            for (let namespace in this.callbacks) {
                 if (this.callbacks[namespace] instanceof Object && this.callbacks[namespace][name.value] instanceof Array) {
                     this.callbacks[namespace][name.value].forEach(function (callback) {
                         result = callback.apply(this, args)
@@ -152,8 +152,8 @@ export default class EventEmitter {
     }
 
     resolveName(name) {
-        const newName = {}
-        const parts = name.split('.')
+        let newName = {}
+        let parts = name.split('.')
 
         newName.original = name
         newName.value = parts[0]

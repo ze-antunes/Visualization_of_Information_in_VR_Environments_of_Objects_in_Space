@@ -14,12 +14,11 @@ export default class Renderer {
     }
 
     setInstance() {
-        setTimeout(() => {
-            this.renderer = this.aframeScene.renderer
-            this.renderer.setClearColor('#000011')
-            this.renderer.antialias = true
-            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-        }, 100)
+        this.renderer = this.aframeScene.renderer
+        // console.log(this.aframeScene.renderer)
+        this.renderer.setClearColor('#000011')
+        this.renderer.antialias = true
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     }
 
     resize() {

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import GUI from 'lil-gui';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { CSG } from 'three-csg-ts';
+import * as MATHJS from 'mathjs';
 
 let conjunctionData;
 
@@ -99,7 +100,7 @@ AFRAME.registerComponent('three-js-target', {
         let targetObject3D = targetEntity.object3D;
         let targetMaterial = targetObject3D.children[0].material
 
-        // console.log(targetEntity, targetObject3D) 
+        // console.log(targetEntity, targetObject3D)
         targetObject3D.children[0].geometry = new THREE.SphereGeometry(.1, 24, 16);
         targetMaterial.color = new THREE.Color('#03fc28')
         targetObject3D.position.set(-0.7, 1, -1);
@@ -124,7 +125,7 @@ AFRAME.registerComponent('three-js-target-covariance', {
     init: function () {
         let targetCovarianceEntity = document.querySelector('#targetCovariance');
         let targetCovarianceObject3D = targetCovarianceEntity.object3D;
-        targetCovarianceObject3D.add(targetCovarianceMesh)
+        // targetCovarianceObject3D.add(targetCovarianceMesh)
     }
 });
 
@@ -135,7 +136,7 @@ AFRAME.registerComponent('three-js-chaser', {
         let chaserObject3D = chaserEntity.object3D;
         let chaserMaterial = chaserObject3D.children[0].material
 
-        // console.log(chaserEntity, chaserObject3D) 
+        // console.log(chaserEntity, chaserObject3D)
         chaserObject3D.children[0].geometry = new THREE.SphereGeometry(.1, 24, 16);
         chaserMaterial.color = new THREE.Color('#0388fc')
         chaserObject3D.position.set(0.7, 1, -1);
@@ -158,27 +159,27 @@ chaserCovarianceMesh.position.set(0.7, 1, -1);
 chaserCovarianceMesh.rotation.set(2, 10, -3);
 
 
-// Test 
-let chaserCovarianceGeometryTest = new THREE.SphereGeometry(0.5, 24, 16);
-chaserCovarianceGeometryTest.rotateZ(Math.PI / 2);
-chaserCovarianceGeometryTest.scale(2, 0, 2);
+// // Test
+// let chaserCovarianceGeometryTest = new THREE.SphereGeometry(0.5, 24, 16);
+// chaserCovarianceGeometryTest.rotateZ(Math.PI / 2);
+// chaserCovarianceGeometryTest.scale(2, 0, 2);
 
-let chaserCovarianceMaterialTest = new THREE.MeshStandardMaterial({
-    color: '#0388fc',
-    // wireframe: true,
-    side: THREE.DoubleSide
-});
+// let chaserCovarianceMaterialTest = new THREE.MeshStandardMaterial({
+//     color: '#0388fc',
+//     // wireframe: true,
+//     side: THREE.DoubleSide
+// });
 
-let chaserCovarianceMeshTest = new THREE.Mesh(chaserCovarianceGeometryTest, chaserCovarianceMaterialTest);
-chaserCovarianceMeshTest.position.set(0.7, 1, -1.999);
-chaserCovarianceMeshTest.rotation.set(Math.PI * 0.5, 0, 0);
+// let chaserCovarianceMeshTest = new THREE.Mesh(chaserCovarianceGeometryTest, chaserCovarianceMaterialTest);
+// chaserCovarianceMeshTest.position.set(0.7, 1, -1.999);
+// chaserCovarianceMeshTest.rotation.set(Math.PI * 0.5, 0, 0);
 
 AFRAME.registerComponent('three-js-chaser-covariance', {
     init: function () {
         let chaserCovarianceEntity = document.querySelector('#chaserCovariance');
         let chaserCovarianceObject3D = chaserCovarianceEntity.object3D;
-        chaserCovarianceObject3D.add(chaserCovarianceMesh)
-        chaserCovarianceObject3D.add(chaserCovarianceMeshTest)
+        // chaserCovarianceObject3D.add(chaserCovarianceMesh)
+        // chaserCovarianceObject3D.add(chaserCovarianceMeshTest)
     }
 });
 
@@ -223,7 +224,7 @@ intRes.scale.set(0.999, 0.999, 0.999);
 
 let targetCovarianceEntity = document.querySelector('#targetCovariance');
 let targetCovarianceObject3D = targetCovarianceEntity.object3D;
-targetCovarianceObject3D.add(intRes)
+// targetCovarianceObject3D.add(intRes)
 
 //Update the intersection after changes
 function handleIntersectionUpdate(xPos, object) {
@@ -249,12 +250,12 @@ function handleIntersectionUpdate(xPos, object) {
     }
     intRes.scale.set(0.999, 0.999, 0.999);
     // scene.add(intRes)
-    targetCovarianceObject3D.add(intRes)
+    // targetCovarianceObject3D.add(intRes)
 }
 
 
-// Walls 
-// Floor 
+// Walls
+// Floor
 let floor = new THREE.Mesh(
     new THREE.PlaneGeometry(4, 4),
     new THREE.MeshStandardMaterial({ color: 'lightgrey' })
@@ -263,7 +264,7 @@ floor.rotation.x = - Math.PI * 0.5
 // floor.castShadow = true; //default is false
 floor.receiveShadow = true;
 
-// Front Wall 
+// Front Wall
 let frontW = new THREE.Mesh(
     new THREE.PlaneGeometry(4, 4),
     new THREE.MeshStandardMaterial({ color: 'lightgrey' })
@@ -273,7 +274,7 @@ frontW.position.y = 2
 // frontW.castShadow = true; //default is false
 frontW.receiveShadow = true;
 
-// Back Wall 
+// Back Wall
 let backW = new THREE.Mesh(
     new THREE.PlaneGeometry(4, 4),
     new THREE.MeshStandardMaterial({ color: 'lightgrey' })
@@ -284,7 +285,7 @@ backW.position.y = 2
 // backW.castShadow = true; //default is false
 backW.receiveShadow = true;
 
-// Left Wall 
+// Left Wall
 let leftW = new THREE.Mesh(
     new THREE.PlaneGeometry(4, 4),
     new THREE.MeshStandardMaterial({ color: 'lightgrey' })
@@ -296,7 +297,7 @@ leftW.position.y = 2
 // leftW.castShadow = true; //default is false
 leftW.receiveShadow = true;
 
-// Right Wall 
+// Right Wall
 let rightW = new THREE.Mesh(
     new THREE.PlaneGeometry(4, 4),
     new THREE.MeshStandardMaterial({ color: 'lightgrey' })
@@ -308,7 +309,7 @@ rightW.position.y = 2
 // rightW.castShadow = true; //default is false
 rightW.receiveShadow = true;
 
-scene.add(floor, frontW, backW, leftW, rightW)
+// scene.add(floor, frontW, backW, leftW, rightW)
 
 //Lights
 let lightsTweaks = gui.addFolder("Lights")
@@ -316,7 +317,7 @@ let ambientLight = new THREE.AmbientLight(0xffffff, .6)
 lightsTweaks.add(ambientLight, 'intensity').min(0).max(3).step(0.001).name("ambientLight intensity")
 scene.add(ambientLight)
 
-// Point light 
+// Point light
 let pointLight = new THREE.PointLight(0xffffff, 0.4, 100);
 pointLight.position.set(1, 2, - 1.5);
 pointLight.castShadow = true;
@@ -366,6 +367,131 @@ chaserTweaks
         handleIntersectionUpdate(value, 1);
     })
 
+
+
+// -------
+
+// Define the covariance matrix P (ensure it is a square 3x3 matrix)
+let P = [
+    [1, 0.2, 0.1],
+    [0.2, 0.1, 0.3],
+    [0.1, 0.3, 2]
+];
+
+// Perform eigenvalue decomposition
+let eigResult = MATHJS.eigs(P);
+let eigenvalues = eigResult.values;
+let eigenvectors = eigResult.eigenvectors;
+
+// Calculate the lengths of the semi-axes
+let semiAxesLengths = eigenvalues.map(Math.sqrt);
+
+// Create the ellipsoid
+let ellipsoidGeometry = new THREE.SphereGeometry(1, 32, 32);
+let ellipsoidMaterial = new THREE.MeshPhongMaterial({ color: 0x00ffff, wireframe: false });
+let ellipsoid = new THREE.Mesh(ellipsoidGeometry, ellipsoidMaterial);
+ellipsoid.position.set(0, 0, 0)
+
+// Scale the ellipsoid
+ellipsoid.scale.set(semiAxesLengths[0], semiAxesLengths[1], semiAxesLengths[2]);
+
+// Apply rotation to align with eigenvectors
+let rotationMatrix = new THREE.Matrix4();
+rotationMatrix.set(
+    eigenvectors[0].vector[0], eigenvectors[0].vector[1], eigenvectors[0].vector[2], 0,
+    eigenvectors[1].vector[0], eigenvectors[1].vector[1], eigenvectors[1].vector[2], 0,
+    eigenvectors[2].vector[0], eigenvectors[2].vector[1], eigenvectors[2].vector[2], 0,
+    0, 0, 0, 1
+);
+ellipsoid.applyMatrix4(rotationMatrix);
+
+scene.add(ellipsoid);
+
+// Find extremal points of the ellipsoid in world coordinates
+let boundingBox = new THREE.Box3().setFromObject(ellipsoid);
+let maxY = boundingBox.max.y;
+let minY = boundingBox.min.y;
+let maxX = boundingBox.max.x;
+let minX = boundingBox.min.x;
+
+// Define plane geometry large enough to encompass the ellipsoid's projection
+let planeGeometry = new THREE.PlaneGeometry(15, 15); // Adjust size as needed
+let planeMaterial = new THREE.ShaderMaterial({
+    uniforms: {
+        maxY: { value: maxY },
+        minY: { value: minY },
+        maxX: { value: maxX },
+        minX: { value: minX }
+    },
+    vertexShader: `
+        varying vec3 vPosition;
+
+        void main() {
+            vPosition = position;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+    `,
+    fragmentShader: `
+        uniform float maxY;
+        uniform float minY;
+        uniform float maxX;
+        uniform float minX;
+
+        varying vec3 vPosition;
+
+        void main() {
+            // Compute position relative to the plane
+            vec2 position2D = vPosition.xy;
+
+            // Compute the ellipsoid silhouette
+            float dx = maxX - minX;
+            float dy = maxY - minY;
+            float cx = (maxX + minX) / 2.0;
+            float cy = (maxY + minY) / 2.0;
+
+            float x = (position2D.x - cx) / dx;
+            float y = (position2D.y - cy) / dy;
+
+            float ellipseValue = x * x + y * y;
+
+            // Check if the fragment is inside the silhouette of the ellipsoid
+            if (ellipseValue <= 1.0) {
+                gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); // Inside, color black
+            } else {
+                gl_FragColor = vec4(0.3, 0.3, 0.3, 1.0); // Outside, color gray
+            }
+        }
+    `,
+    side: THREE.DoubleSide // Ensure both sides of the plane are rendered
+});
+
+// Create the plane mesh
+let plane = new THREE.Mesh(planeGeometry, planeMaterial);
+plane.position.set(0, 0, -3); // Position the plane appropriately
+scene.add(plane);
+
+let ellipsoidTweaks = gui.addFolder("Ellipsoid")
+ellipsoidTweaks
+    .add(ellipsoid.scale, 'x')
+    .min(-3)
+    .max(3)
+    .step(0.01)
+    .name('x-scale')
+
+ellipsoidTweaks
+    .add(ellipsoid.rotation, 'x')
+    .min(-3)
+    .max(3)
+    .step(0.01)
+    .name('x-rotate')
+
+ellipsoidTweaks
+    .add(ellipsoid.position, 'x')
+    .min(-3)
+    .max(3)
+    .step(0.01)
+    .name('x-position')
+
 /**
  * Animate
  */
@@ -374,8 +500,365 @@ let clock = new THREE.Clock()
 let tick = () => {
     let elapsedTime = clock.getElapsedTime()
 
+        ellipsoid.rotation.x += 0.01;
+        ellipsoid.rotation.y += 0.01;
+
+    // Update uniforms for extremal points
+    boundingBox.setFromObject(ellipsoid);
+    plane.material.uniforms.maxY.value = boundingBox.max.y;
+    plane.material.uniforms.minY.value = boundingBox.min.y;
+    plane.material.uniforms.maxX.value = boundingBox.max.x;
+    plane.material.uniforms.minX.value = boundingBox.min.x;
+
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)
 }
 
 tick()
+
+
+// ------------------------------------------------------------------------
+
+// // Define the covariance matrix P (ensure it is a square 3x3 matrix)
+// let P = [
+//     [1, 0.2, 0.1],
+//     [0.2, 0.1, 0.3],
+//     [0.1, 0.3, 2]
+// ];
+
+// // Perform eigenvalue decomposition
+// let eigResult = MATHJS.eigs(P);
+// let eigenvalues = eigResult.values;
+// let eigenvectors = eigResult.eigenvectors;
+
+// // Calculate the lengths of the semi-axes
+// let semiAxesLengths = eigenvalues.map(Math.sqrt);
+
+// // Create the ellipsoid
+// let ellipsoidGeometry = new THREE.SphereGeometry(1, 32, 32);
+// let ellipsoidMaterial = new THREE.MeshPhongMaterial({ color: 0x00ffff, wireframe: false });
+// let ellipsoid = new THREE.Mesh(ellipsoidGeometry, ellipsoidMaterial);
+// ellipsoid.position.set(0, 0, 0)
+
+// // Scale the ellipsoid
+// ellipsoid.scale.set(semiAxesLengths[0], semiAxesLengths[1], semiAxesLengths[2]);
+
+// // Apply rotation to align with eigenvectors
+// let rotationMatrix = new THREE.Matrix4();
+// rotationMatrix.set(
+//     eigenvectors[0].vector[0], eigenvectors[0].vector[1], eigenvectors[0].vector[2], 0,
+//     eigenvectors[1].vector[0], eigenvectors[1].vector[1], eigenvectors[1].vector[2], 0,
+//     eigenvectors[2].vector[0], eigenvectors[2].vector[1], eigenvectors[2].vector[2], 0,
+//     0, 0, 0, 1
+// );
+// ellipsoid.applyMatrix4(rotationMatrix);
+
+// scene.add(ellipsoid);
+
+// // Create a plane
+// let planeGeometry = new THREE.PlaneGeometry(10, 10);
+// let planeMaterial = new THREE.ShaderMaterial({
+//     vertexShader: `
+//     varying vec3 vWorldPosition;
+
+//   void main() {
+//     vWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+//     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+//   }
+//   `,
+//     fragmentShader: `
+//     varying vec3 vWorldPosition;
+//     uniform vec3 boxVertices[13];
+//     uniform int nVertices;
+
+//     bool pointInPolygon(vec2 point, vec2 vertices[13]) {
+//         bool inside = false;
+//         for(int i = 0, j = 12; i < 13; j = i++) {
+//         if ((vertices[i].y > point.y) != (vertices[j].y > point.y) &&
+//             (point.x < (vertices[j].x - vertices[i].x) * (point.y - vertices[i].y) / (vertices[j].y - vertices[i].y) + vertices[i].x)) {
+//             inside = !inside;
+//         }
+//         }
+//         return inside;
+//     }
+
+//     void main() {
+//         // Calculate the projection of the box vertices onto the plane
+//         vec2 projectedVertices[13];
+//         for(int i = 0; i < 13; i++) {
+//         projectedVertices[i] = boxVertices[i].xz;
+//         }
+
+//         // Check if the current fragment is inside the projected shape
+//         vec2 fragPos = vWorldPosition.xz;
+//         bool inside = pointInPolygon(fragPos, projectedVertices);
+
+//     if (inside) {
+//             gl_FragColor = vec4(0.0, 0.0, 0.0, 0.5); // Shadow color
+//         } else {
+//             gl_FragColor = vec4(0.3, 0.3, 0.3, 0.5); // Shade of gray for the plane
+//         }
+//     }
+//   `,
+//     uniforms: {
+//         boxVertices: { value: [] }
+//     },
+//     transparent: true,
+// });
+// let plane = new THREE.Mesh(planeGeometry, planeMaterial);
+// plane.position.set(0, -5, 0);
+// plane.rotation.x = -Math.PI / 2;
+// scene.add(plane);
+
+// // Create a box
+// let boxGeometry = new THREE.BoxGeometry(2, 2, 2);
+// let boxMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: false });
+// let box = new THREE.Mesh(boxGeometry, boxMaterial);
+// scene.add(box);
+
+// let boxTweaks = gui.addFolder("BoX")
+// boxTweaks
+//     .add(box.scale, 'x')
+//     .min(-5)
+//     .max(5)
+//     .step(0.01)
+//     .name('x-scale')
+
+// boxTweaks
+//     .add(box.position, 'x')
+//     .min(-5)
+//     .max(5)
+//     .step(0.01)
+//     .name('x-position')
+
+// boxTweaks
+//     .add(box.rotation, 'x')
+//     .min(-5)
+//     .max(5)
+//     .step(0.01)
+//     .name('x-rotation')
+
+// boxTweaks
+//     .add(box.rotation, 'y')
+//     .min(-5)
+//     .max(5)
+//     .step(0.01)
+//     .name('y-rotation')
+
+// // Position the camera and objects
+// box.position.set(0, 0, 0);
+
+// // Box vertices for projection
+// let boxVertices = [
+//     new THREE.Vector3(-1, -1, -1),
+//     new THREE.Vector3(1, -1, -1),
+//     new THREE.Vector3(1, -1, 1),
+//     new THREE.Vector3(-1, -1, 1),
+
+//     new THREE.Vector3(-1, 1, 1),
+//     new THREE.Vector3(-1, 1, -1),
+
+//     new THREE.Vector3(1, 1, -1),
+//     new THREE.Vector3(1, 1, 1),
+
+//     new THREE.Vector3(-1, -1, -1),
+//     new THREE.Vector3(-1, 1, -1),
+
+//     new THREE.Vector3(1, -1, -1),
+//     new THREE.Vector3(1, 1, -1),
+//     new THREE.Vector3(1, -1, 1),
+//     new THREE.Vector3(1, 1, 1),
+
+//     new THREE.Vector3(-1, -1, 1),
+//     new THREE.Vector3(-1, 1, 1)
+// ];
+
+// // Function to update box vertices in shader uniforms
+// function updateBoxVertices() {
+//     let transformedVertices = boxVertices.map(vertex => box.localToWorld(vertex.clone()));
+//     planeMaterial.uniforms.boxVertices.value = transformedVertices;
+// }
+
+// /**
+//  * Animate
+//  */
+// let clock = new THREE.Clock()
+
+// let tick = () => {
+//     let elapsedTime = clock.getElapsedTime()
+
+//     // box.rotation.x += 0.01;
+//     // box.rotation.y += 0.01;
+//     updateBoxVertices();
+
+//     // Call tick again on the next frame
+//     window.requestAnimationFrame(tick)
+// }
+
+// tick()
+
+
+// ------------------------------------------------------------------------
+
+// // Create a light source
+// let light = new THREE.DirectionalLight(0xffffff, 1);
+// light.position.set(10, 10, 10); // Position the light
+// // scene.add(light);
+
+// // Define the covariance matrix P (ensure it is a square 3x3 matrix)
+// let P = [
+//     [1, 0.2, 0.1],
+//     [0.2, 0.1, 0.3],
+//     [0.1, 0.3, 2]
+// ];
+
+// // Perform eigenvalue decomposition
+// let eigResult = MATHJS.eigs(P);
+// let eigenvalues = eigResult.values;
+// let eigenvectors = eigResult.eigenvectors;
+
+// // Calculate the lengths of the semi-axes
+// let semiAxesLengths = eigenvalues.map(Math.sqrt);
+
+// // Create the ellipsoid
+// let ellipsoidGeometry = new THREE.SphereGeometry(1, 32, 32);
+// let ellipsoidMaterial = new THREE.MeshPhongMaterial({ color: 0x00ffff, wireframe: false });
+// let ellipsoid = new THREE.Mesh(ellipsoidGeometry, ellipsoidMaterial);
+// ellipsoid.position.set(0, 0, 0)
+
+// // Scale the ellipsoid
+// ellipsoid.scale.set(semiAxesLengths[0], semiAxesLengths[1], semiAxesLengths[2]);
+
+// // Apply rotation to align with eigenvectors
+// let rotationMatrix = new THREE.Matrix4();
+// rotationMatrix.set(
+//     eigenvectors[0].vector[0], eigenvectors[0].vector[1], eigenvectors[0].vector[2], 0,
+//     eigenvectors[1].vector[0], eigenvectors[1].vector[1], eigenvectors[1].vector[2], 0,
+//     eigenvectors[2].vector[0], eigenvectors[2].vector[1], eigenvectors[2].vector[2], 0,
+//     0, 0, 0, 1
+// );
+// ellipsoid.applyMatrix4(rotationMatrix);
+
+// scene.add(ellipsoid);
+
+// let ellipsoidTweaks = gui.addFolder("Ellipsoid")
+// ellipsoidTweaks
+//     .add(ellipsoid.scale, 'x')
+//     .min(-5)
+//     .max(5)
+//     .step(0.01)
+//     .name('x-scale')
+
+// ellipsoidTweaks
+//     .add(ellipsoid.position, 'x')
+//     .min(-5)
+//     .max(5)
+//     .step(0.01)
+//     .name('x-position')
+
+// ellipsoidTweaks
+//     .add(ellipsoid.rotation, 'x')
+//     .min(-5)
+//     .max(5)
+//     .step(0.01)
+//     .name('x-rotation')
+
+// ellipsoidTweaks
+//     .add(ellipsoid.rotation, 'y')
+//     .min(-5)
+//     .max(5)
+//     .step(0.01)
+//     .name('y-rotation')
+
+// // Create a plane
+// let planeGeometry = new THREE.PlaneGeometry(10, 10);
+// let planeMaterial = new THREE.ShaderMaterial({
+//     vertexShader: `
+//     varying vec3 vWorldPosition;
+
+//     void main() {
+//         vWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+//         gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+//     }
+//     `,
+//     fragmentShader: `
+//     varying vec3 vWorldPosition;
+//     uniform vec3 lightPosition;
+//     uniform vec3 ellipsoidVertices[8];
+
+//     bool pointInPolygon(vec2 point, vec2 vertices[8]) {
+//         bool inside = false;
+//         for(int i = 0, j = 7; i < 8; j = i++) {
+//             if ((vertices[i].y > point.y) != (vertices[j].y > point.y) &&
+//                 (point.x < (vertices[j].x - vertices[i].x) * (point.y - vertices[i].y) / (vertices[j].y - vertices[i].y) + vertices[i].x)) {
+//                 inside = !inside;
+//             }
+//         }
+//         return inside;
+//     }
+
+//     void main() {
+//         vec2 projectedVertices[8];
+//         for (int i = 0; i < 8; i++) {
+//             vec3 lightDir = normalize(ellipsoidVertices[i] - lightPosition);
+//             float t = -ellipsoidVertices[i].y / lightDir.y;
+//             projectedVertices[i] = (ellipsoidVertices[i] + t * lightDir).xz;
+//         }
+
+//         vec2 fragPos = vWorldPosition.xz;
+//         bool inside = pointInPolygon(fragPos, projectedVertices);
+
+//         if (inside) {
+//             gl_FragColor = vec4(0.0, 0.0, 0.0, 0.5); // Shadow color
+//         } else {
+//             gl_FragColor = vec4(0.3, 0.3, 0.3, 0.5); // Shade of gray for the plane
+//         }
+//     }
+//     `,
+//     uniforms: {
+//         lightPosition: { value: light.position },
+//         ellipsoidVertices: { value: [] }
+//     },
+//     transparent: true,
+// });
+// let plane = new THREE.Mesh(planeGeometry, planeMaterial);
+// plane.position.set(0, -5, 0);
+// plane.rotation.x = -Math.PI / 2;
+// scene.add(plane);
+
+// // Function to update ellipsoid vertices for shadow projection
+// function updateEllipsoidVertices() {
+//     let rotationMatrix = new THREE.Matrix4().makeRotationFromEuler(ellipsoid.rotation);
+
+//     let vertices = [
+//         new THREE.Vector3(-1, -1, -1).applyMatrix4(rotationMatrix).multiplyScalar(semiAxesLengths[0]),
+//         new THREE.Vector3(1, -1, -1).applyMatrix4(rotationMatrix).multiplyScalar(semiAxesLengths[1]),
+//         new THREE.Vector3(1, 1, -1).applyMatrix4(rotationMatrix).multiplyScalar(semiAxesLengths[2]),
+//         new THREE.Vector3(-1, 1, -1).applyMatrix4(rotationMatrix).multiplyScalar(semiAxesLengths[0]),
+//         new THREE.Vector3(-1, -1, 1).applyMatrix4(rotationMatrix).multiplyScalar(semiAxesLengths[1]),
+//         new THREE.Vector3(1, -1, 1).applyMatrix4(rotationMatrix).multiplyScalar(semiAxesLengths[2]),
+//         new THREE.Vector3(1, 1, 1).applyMatrix4(rotationMatrix).multiplyScalar(semiAxesLengths[0]),
+//         new THREE.Vector3(-1, 1, 1).applyMatrix4(rotationMatrix).multiplyScalar(semiAxesLengths[1])
+//     ];
+
+//     let transformedVertices = vertices.map(vertex => ellipsoid.localToWorld(vertex.clone()));
+//     planeMaterial.uniforms.ellipsoidVertices.value = transformedVertices;
+// }
+
+// /**
+//  * Animate
+//  */
+// let clock = new THREE.Clock();
+
+// let tick = () => {
+//     let elapsedTime = clock.getElapsedTime();
+
+//     ellipsoid.rotation.x += 0.01;
+//     ellipsoid.rotation.y += 0.01;
+//     updateEllipsoidVertices();
+
+//     // Call tick again on the next frame
+//     window.requestAnimationFrame(tick);
+// }
+
+// tick();

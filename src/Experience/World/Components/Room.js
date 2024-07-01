@@ -13,20 +13,24 @@ export default class Room {
         this.debug = this.experience.debug
         this.data = this.experience.data
         this.roomView = this.experience.roomView
+        this.roomConjunction = document.querySelector('#room-conjunction').object3D
 
-        this.target = new Objects(this.roomView, this.resources.items.target1Model,'target', 'lightgreen', Math.PI * 2.4, Math.PI * 0.4, 1.5, 0.0001)
-        this.chaser = new Objects(this.roomView, this.resources.items.chaser1Model,'chaser', 'lightblue', Math.PI * 2.1, Math.PI * 0, 1.5, 0.00015)
+        // Setup 
+        this.modelSize = 2
+
+        this.target = new Objects(this.roomConjunction, this.resources.items.target1Model, 'target', 'lightgreen', this.modelSize)
+        this.chaser = new Objects(this.roomConjunction, this.resources.items.chaser1Model, 'chaser', 'lightblue', this.modelSize)
+        this.targetPosManoeuvre = new Objects(this.roomConjunction, this.resources.items.targetPosManoeuvre1Model, 'target', '#FFBE0B', this.modelSize)
 
         this.setRoom()
-        this.hide()
     }
 
     setRoom() {
         // Walls
         let wallGeometry = new THREE.PlaneGeometry(4, 4)
-        let wallMaterial = new THREE.MeshStandardMaterial({ color: 'lightgrey' })
+        let wallMaterial = new THREE.MeshStandardMaterial({ color: new THREE.Color('#000') })
         // wallMaterial.wireframe = true
-        
+
         // Floor 
         let floor = new THREE.Mesh(
             wallGeometry,
@@ -96,30 +100,31 @@ export default class Room {
         let targetPosition = new THREE.Vector3(targetStateVector.x, targetStateVector.y, targetStateVector.z);
         let chaserPosition = new THREE.Vector3(chaserStateVector.x, chaserStateVector.y, chaserStateVector.z);
 
-        let a = targetStateVector.x - chaserStateVector.x;
-        let b = targetStateVector.y - chaserStateVector.y;
-        let c = targetStateVector.z - chaserStateVector.z;
-
-        let distance = Math.sqrt(a * a + b * b + c * c);
-
-        // console.log("distance: ", distance)
-
         // Scale the positions to fit the 1 unit radius Earth model (2 unit diameter model)
         let scaledTargetPosition = this.scaleCoordinatesToModel([targetStateVector])[0];
         let scaledChaserPosition = this.scaleCoordinatesToModel([chaserStateVector])[0];
 
+        let a = scaledTargetPosition.x - scaledChaserPosition.x;
+        let b = scaledTargetPosition.y - scaledChaserPosition.y;
+        let c = scaledTargetPosition.z - scaledChaserPosition.z;
+
+        let distance = Math.sqrt(a * a + b * b + c * c);
+        // console.log(distance)
+
         if (this.target && this.chaser) {
-            this.target.model.position.set(scaledTargetPosition.x, scaledTargetPosition.y, scaledTargetPosition.z)
-            this.chaser.model.position.set(scaledChaserPosition.x, scaledChaserPosition.y, scaledChaserPosition.z)
+            this.target.model.position.set(a/2, b/2, c/2)
+            this.chaser.model.position.set(-a/2, -b/2, -c/2)
             this.target.covarianceData = dataToDisplay.details.target.covariance
             this.chaser.covarianceData = dataToDisplay.details.chaser.covariance
         }
+
+        this.roomConjunction.scale.set(10,10,10)
     }
 
     scaleCoordinatesToModel(positions) {
         // Define scaling factor based on real-life dimensions
         let realLifeDiameter = 12742000;
-        let modelDiameter = 2;
+        let modelDiameter = this.modelSize;
         let scalingFactor = modelDiameter / realLifeDiameter;
 
         // Scale and convert positions
@@ -134,10 +139,6 @@ export default class Room {
         return scaledPositions;
     }
 
-    update() {
-        console.log("room update")
-    }
-
     show() {
         gsap.to(this.roomView.position, 1, { x: 0, ease: "easeInOut" })
         gsap.to(this.roomView.scale, { x: 1, y: 1, z: 1 })
@@ -146,5 +147,11 @@ export default class Room {
     hide() {
         gsap.to(this.roomView.position, 1, { x: 5, ease: "easeInOut" })
         gsap.to(this.roomView.scale, { x: 0, y: 0, z: 0 })
+    }
+
+    update() {
+        // Update target and chaser objects
+        if (this.target) this.target.update();
+        if (this.chaser) this.chaser.update();
     }
 }

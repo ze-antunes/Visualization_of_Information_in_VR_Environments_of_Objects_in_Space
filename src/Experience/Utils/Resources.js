@@ -68,7 +68,7 @@ export default class Resources extends EventEmitter {
     }
 
     fetchData() {
-        fetch("https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/exp_conjunctions.json")
+        fetch("conjunctions.json")
             .then(response => response.json())
             .then(data => {
                 this.setData(data)

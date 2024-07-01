@@ -30,10 +30,12 @@
           position="0 0 0"
           id="globe"
           scale="0.7 0.7 0.7"
-          three-js-globe
         >
         </a-entity>
-        <a-entity position="5 0 0" id="room" three-js-room></a-entity>
+        <a-entity position="5 0 0" scale="0 0 0" id="room">
+          <a-entity id="room-conjunction">
+          </a-entity>
+        </a-entity>
       </a-box>
 
       <a-entity>

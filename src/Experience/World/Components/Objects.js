@@ -5,50 +5,45 @@ import Trajectory from './Trajectory'
 import ObjectPopup from './UI/ObjectPopup'
 
 export default class Objects {
-    constructor(view, resource, type, color, theta, phi, radius, velocity) {
+    constructor(view, resource, type, color, modelSize) {
         this.experience = new Experience()
         this.scene = this.experience.scene
         this.time = this.experience.time
         this.debug = this.experience.debug
-
-
-        // Debug
-        // if (this.debug.active) {
-        //     this.debugFolder = this.debug.ui.addFolder('Objects')
-        // }
 
         // Setup 
         this.resource = resource
         this.type = type
         this.color = color
         this.view = view
-        this.theta = theta
-        this.phi = phi
-        this.radius = radius
-        this.velocity = velocity
+        this.modelSize = modelSize
         this.objsToTest = this.experience.raycaster.objsToTest
+
         this.isPopupOpen = false
-        if (this.type === "target")
+        if (this.type === "target") {
             this.covarianceData = this.experience.data.conjunctions[0].details.target.covariance
-        else
+        }
+        else {
             this.covarianceData = this.experience.data.conjunctions[0].details.chaser.covariance
+        }
 
         this.setModel()
 
         if (this.model && this.modelParameters) {
-            this.covariance = new Covariance(this.model, this.modelParameters, this.type, this.covarianceData)
-            this.trajectory = new Trajectory(this.model, this.modelParameters)
+            this.covariance = new Covariance(this.model, this.modelParameters, this.type, this.covarianceData, this.modelSize)
+            this.trajectory = new Trajectory(this.model, this.modelParameters, this.trajectoryData)
         }
     }
 
     setModel() {
         this.model = this.resource.scene
         this.modelParameters = {}
-        this.modelParameters.trajectoryThetaAngle = this.theta
-        this.modelParameters.trajectoryPhiAngle = this.phi
-        this.modelParameters.trajectoryRadius = this.radius
-        this.modelParameters.color = this.color
-        this.modelParameters.velocity = this.velocity
+        // this.modelParameters.trajectoryThetaAngle = this.theta
+        // this.modelParameters.trajectoryPhiAngle = this.phi
+        // this.modelParameters.trajectoryRadius = this.radius
+        this.modelParameters.color = new THREE.Color(this.color)
+        // this.modelParameters.velocity = this.velocity
+        // console.log(this.modelParameters.color)
 
         if (this.type === "target")
             this.model.scale.set(0.05, 0.05, 0.05)
@@ -84,10 +79,10 @@ export default class Objects {
     }
 
     update() {
-        this.model.thetaAngle = this.time.elapsed * this.modelParameters.velocity
-        this.model.position.x = Math.cos(this.model.thetaAngle) * this.modelParameters.trajectoryRadius
-        this.model.position.y = Math.sin(this.model.thetaAngle) * Math.sin(this.modelParameters.trajectoryPhiAngle) * this.modelParameters.trajectoryRadius
-        this.model.position.z = Math.sin(this.model.thetaAngle) * Math.cos(this.modelParameters.trajectoryPhiAngle) * this.modelParameters.trajectoryRadius
+        // this.model.thetaAngle = this.time.elapsed * this.modelParameters.velocity
+        // this.model.position.x = Math.cos(this.model.thetaAngle) * this.modelParameters.trajectoryRadius
+        // this.model.position.y = Math.sin(this.model.thetaAngle) * Math.sin(this.modelParameters.trajectoryPhiAngle) * this.modelParameters.trajectoryRadius
+        // this.model.position.z = Math.sin(this.model.thetaAngle) * Math.cos(this.modelParameters.trajectoryPhiAngle) * this.modelParameters.trajectoryRadius
         this.popup.update()
     }
 

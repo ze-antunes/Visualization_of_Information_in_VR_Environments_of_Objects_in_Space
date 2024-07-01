@@ -2,7 +2,7 @@ import Experience from "../../Experience"
 import * as MATHJS from 'mathjs';
 
 export default class Covariance {
-    constructor(object, objectParameters, type, data) {
+    constructor(object, objectParameters, type, data, modelSize) {
         this.experience = new Experience
         this.scene = this.experience.scene
         this.time = this.experience.time
@@ -13,7 +13,7 @@ export default class Covariance {
         this.objectParameters = objectParameters
         this.type = type
         this.data = data
-        this.modelSize = 2
+        this.modelSize = modelSize
 
         // console.log(this.data)
         this.setCovariance()
@@ -34,7 +34,7 @@ export default class Covariance {
 
         // Calculate the lengths of the semi-axes
         let semiAxesLengths = eigenvalues.map(Math.sqrt);
-        // console.log(P)
+        // console.log(semiAxesLengths)
 
         // Create the ellipsoid
         let ellipsoidGeometry = new THREE.SphereGeometry(1, 32, 32);
@@ -53,6 +53,7 @@ export default class Covariance {
         let scaledSemiAxesLengths = this.scaleToModel(semiAxesLengths, this.modelSize);
         // console.log('Scaled Semi-Axes Lengths:', scaledSemiAxesLengths);
         // ellipsoid.scale.set(scaledSemiAxesLengths[0], scaledSemiAxesLengths[1], scaledSemiAxesLengths[2]);
+
         ellipsoid.scale.set(semiAxesLengths[0] * 0.01, semiAxesLengths[1] * 0.01, semiAxesLengths[2] * 0.0001);
         // ellipsoid.scale.set(semiAxesLengths[0], semiAxesLengths[1], semiAxesLengths[2]);
  
@@ -65,29 +66,6 @@ export default class Covariance {
             0, 0, 0, 1
         );
         ellipsoid.applyMatrix4(rotationMatrix);
-        // console.log(rotationMatrix)
-
-
-        // ---------------- 
-
-        // this.geometry = new THREE.SphereGeometry(0.5, 24, 16);
-        // this.geometry.rotateZ(Math.PI / 2);
-        // if (this.type === "target")
-        //     this.geometry.scale(4.6, 1.5, 1.2);
-        // else
-        //     this.geometry.scale(4.6 * 10, 1.5 * 10, 1.2 * 10);
-
-        // this.material = new THREE.MeshStandardMaterial({
-        //     color: this.objectParameters.color,
-        //     transparent: true,
-        //     opacity: 0.2,
-        //     side: THREE.DoubleSide
-        // });
-
-        // this.mesh = new THREE.Mesh(this.geometry, this.material)
-        
-
-        // ---------------- 
 
         this.object.add(ellipsoid)
     }

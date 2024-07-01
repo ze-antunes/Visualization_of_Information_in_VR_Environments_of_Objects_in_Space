@@ -101,4 +101,14 @@ export default [
         type: 'gltfModel',
         path: 'https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/3D_Models/Chaser/scene.gltf',
     },
+    {
+        name: 'targetPosManoeuvreModel',
+        type: 'gltfModel',
+        path: 'https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/3D_Models/Target/scene.gltf',
+    },
+    {
+        name: 'targetPosManoeuvre1Model',
+        type: 'gltfModel',
+        path: 'https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/3D_Models/Target/scene.gltf',
+    },
 ]

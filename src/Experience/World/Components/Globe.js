@@ -25,8 +25,12 @@ export default class Globe {
             this.debugFolder = this.debug.ui.addFolder('Globe')
         }
 
-        this.target = new Objects(this.globeView, this.resources.items.targetModel, 'target', 'lightgreen', Math.PI * 2.4, Math.PI * 0.4, 1.5, 0.0001)
-        this.chaser = new Objects(this.globeView, this.resources.items.chaserModel, 'chaser', 'lightblue', Math.PI * 2.1, Math.PI * 0, 1.5, 0.00015)
+        // Setup 
+        this.modelSize = 2
+
+        this.target = new Objects(this.globeView, this.resources.items.targetModel, 'target', 'lightgreen', this.modelSize)
+        this.chaser = new Objects(this.globeView, this.resources.items.chaserModel, 'chaser', 'lightblue', this.modelSize)
+        this.targetPosManoeuvre = new Objects(this.globeView, this.resources.items.targetPosManoeuvreModel, 'target', '#FFBE0B', this.modelSize)
 
         this.setGeometries()
         this.setTextures()
@@ -175,8 +179,8 @@ export default class Globe {
         this.earth.rotation.y = elapsedTime * rotationAnglePerSecond;
 
         // Update target and chaser objects
-        // if (this.target) this.target.update();
-        // if (this.chaser) this.chaser.update();
+        if (this.target) this.target.update();
+        if (this.chaser) this.chaser.update();
     }
 
     updateVisualization(conjunction) {
@@ -195,6 +199,7 @@ export default class Globe {
         let chaserPosition = new THREE.Vector3(chaserStateVector.x, chaserStateVector.y, chaserStateVector.z);
 
         // Globe Entity rotation
+        // TODO: Update sunSpherical after the globe rotation
         let testeCalculateRotationAngle = this.calculateRotationAngle(targetStateVector.z, targetStateVector.x)
         gsap.to(this.globeView.rotation, 1, { y: THREE.MathUtils.degToRad(testeCalculateRotationAngle), ease: "easeInOut" })
 
@@ -212,7 +217,10 @@ export default class Globe {
 
         if (this.target && this.chaser) {
             gsap.to(this.target.model.position, 1, { x: scaledTargetPosition.x, y: scaledTargetPosition.y, z: scaledTargetPosition.z, ease: "easeInOut" })
-            gsap.to(this.chaser.model.position, 1, { x: scaledTargetPosition.x, y: scaledTargetPosition.y, z: scaledTargetPosition.z, ease: "easeInOut" })
+            gsap.to(this.chaser.model.position, 1, { x: scaledChaserPosition.x, y: scaledChaserPosition.y, z: scaledChaserPosition.z, ease: "easeInOut" })
+            console.log(this.target.popup.mesh.position)
+            gsap.to(this.target.popup.mesh.position, 1, { x: scaledTargetPosition.x, y: scaledTargetPosition.y, z: scaledTargetPosition.z, ease: "easeInOut" })
+            gsap.to(this.chaser.popup.mesh.position, 1, { x: scaledChaserPosition.x, y: scaledChaserPosition.y, z: scaledChaserPosition.z, ease: "easeInOut" })
             this.target.covarianceData = dataToDisplay.details.target.covariance
             this.chaser.covarianceData = dataToDisplay.details.chaser.covariance
         }
@@ -221,7 +229,7 @@ export default class Globe {
     scaleCoordinatesToModel(positions) {
         // Define scaling factor based on real-life dimensions
         let realLifeDiameter = 12742000;
-        let modelDiameter = 2;
+        let modelDiameter = this.modelSize;
         let scalingFactor = modelDiameter / realLifeDiameter;
 
         // Scale and convert positions

@@ -98,6 +98,9 @@ export default class World {
     update() {
         if (this.globe)
             this.globe.update()
+                
+        if (this.room)
+            this.room.update()
 
         if (this.vr) {
             if (this.leftHand && this.conjunctionsMenu) {

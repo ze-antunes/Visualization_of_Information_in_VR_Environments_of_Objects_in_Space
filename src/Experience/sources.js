@@ -84,31 +84,31 @@ export default [
     {
         name: 'targetModel',
         type: 'gltfModel',
-        path: 'https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/3D_Models/Target/scene.gltf',
+        path: 'models/satellites/target.glb',
     },
     {
         name: 'chaserModel',
         type: 'gltfModel',
-        path: 'https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/3D_Models/Chaser/scene.gltf',
+        path: 'models/satellites/chaser.glb',
     },
     {
         name: 'target1Model',
         type: 'gltfModel',
-        path: 'https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/3D_Models/Target/scene.gltf',
+        path: 'models/satellites/target.glb',
     },
     {
         name: 'chaser1Model',
         type: 'gltfModel',
-        path: 'https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/3D_Models/Chaser/scene.gltf',
+        path: 'models/satellites/chaser.glb',
     },
     {
         name: 'targetPosManoeuvreModel',
         type: 'gltfModel',
-        path: 'https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/3D_Models/Target/scene.gltf',
+        path: 'models/satellites/target.glb',
     },
     {
         name: 'targetPosManoeuvre1Model',
         type: 'gltfModel',
-        path: 'https://raw.githubusercontent.com/ze-antunes/ARVI_Assets/main/3D_Models/Target/scene.gltf',
+        path: 'models/satellites/target.glb',
     },
 ]

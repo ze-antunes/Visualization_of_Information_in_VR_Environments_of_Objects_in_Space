@@ -40,7 +40,7 @@ export default class Globe {
     }
 
     setGeometries() {
-        this.earthGeometry = new THREE.SphereGeometry(1, 64, 64)
+        this.earthGeometry = new THREE.SphereGeometry(1, 32, 32)
     }
 
     setTextures() {
@@ -218,7 +218,7 @@ export default class Globe {
         if (this.target && this.chaser) {
             gsap.to(this.target.model.position, 1, { x: scaledTargetPosition.x, y: scaledTargetPosition.y, z: scaledTargetPosition.z, ease: "easeInOut" })
             gsap.to(this.chaser.model.position, 1, { x: scaledChaserPosition.x, y: scaledChaserPosition.y, z: scaledChaserPosition.z, ease: "easeInOut" })
-            console.log(this.target.popup.mesh.position)
+            // console.log(this.target.popup.mesh.position)
             gsap.to(this.target.popup.mesh.position, 1, { x: scaledTargetPosition.x, y: scaledTargetPosition.y, z: scaledTargetPosition.z, ease: "easeInOut" })
             gsap.to(this.chaser.popup.mesh.position, 1, { x: scaledChaserPosition.x, y: scaledChaserPosition.y, z: scaledChaserPosition.z, ease: "easeInOut" })
             this.target.covarianceData = dataToDisplay.details.target.covariance

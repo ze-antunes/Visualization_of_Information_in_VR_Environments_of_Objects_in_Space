@@ -20,8 +20,19 @@ window.addEventListener("load", function (event) {
     let experience = new Experience(aframeScene, scene, aframeCamera, rightHand, leftHand)
 });
 
+let stats = false
+let scene = document.querySelector('#myScene');
 
-// document.addEventListener("keydown", function (e) {
-//     if (e.key === "e") {
-//     }
-// });
+document.addEventListener("keydown", function (e) {
+    if (e.key === "e") {
+        if (stats == false) {
+            // console.log(stats, "add")
+            scene.setAttribute("stats", "")
+        }
+        else {
+            // console.log(stats, "remove")
+            scene.removeAttribute("stats")
+        }
+        stats = !stats
+    }
+});

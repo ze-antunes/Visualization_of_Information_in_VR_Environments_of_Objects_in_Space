@@ -22,9 +22,11 @@ export default class Objects {
         this.isPopupOpen = false
         if (this.type === "target") {
             this.covarianceData = this.experience.data.conjunctions[0].details.target.covariance
+            console.log(this.experience.data.conjunctions[0].details.target)
         }
         else {
             this.covarianceData = this.experience.data.conjunctions[0].details.chaser.covariance
+            console.log(this.experience.data.conjunctions[0].details.target)
         }
 
         this.setModel()
@@ -45,10 +47,11 @@ export default class Objects {
         // this.modelParameters.velocity = this.velocity
         // console.log(this.modelParameters.color)
 
-        if (this.type === "target")
-            this.model.scale.set(0.05, 0.05, 0.05)
-        else
-            this.model.scale.set(0.005, 0.005, 0.005)
+        this.model.scale.set(0.05, 0.05, 0.05)
+        // if (this.type === "target")
+        //     this.model.scale.set(0.05, 0.05, 0.05)
+        // else
+        //     this.model.scale.set(0.005, 0.005, 0.005)
         this.model.hasStates = true
         this.model.states = {}
 

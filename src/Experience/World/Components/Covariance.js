@@ -43,13 +43,14 @@ export default class Covariance {
             color: this.objectParameters.color,
             transparent: true,
             opacity: 0.2,
-            side: THREE.DoubleSide
+            side: THREE.DoubleSide,
+            // wireframe: true
         });
         let ellipsoid = new THREE.Mesh(ellipsoidGeometry, ellipsoidMaterial);
         ellipsoid.position.set(0, 0, 0)
 
         // Scale the ellipsoid
-        // Desired model size (2 meters)
+        // Model size (2 meters)
         let scaledSemiAxesLengths = this.scaleToModel(semiAxesLengths, this.modelSize);
         // console.log('Scaled Semi-Axes Lengths:', scaledSemiAxesLengths);
         // ellipsoid.scale.set(scaledSemiAxesLengths[0], scaledSemiAxesLengths[1], scaledSemiAxesLengths[2]);

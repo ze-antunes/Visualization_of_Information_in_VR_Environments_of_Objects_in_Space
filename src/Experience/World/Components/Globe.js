@@ -17,20 +17,31 @@ export default class Globe {
         this.data = this.experience.data
         this.debug = this.experience.debug
         this.globeView = this.experience.globeView
+        this.globeTarget = document.querySelector('#globe-target')
+        this.globeTargetPosManoeuvre = document.querySelector('#globe-target-posmanoeuvre')
+        this.globeChaser = document.querySelector('#globe-chaser')
 
         // console.log(this.data)
+
+        // document.querySelector('#globe-target').addEventListener("click", () => { console.log("ola") })
+        // document.querySelector('#globe-target').addEventListener("mouseleave", () => { console.log("adeus") })
 
         // Debug
         if (this.debug.active) {
             this.debugFolder = this.debug.ui.addFolder('Globe')
+            this.debugFolder
+                .add(this.globeView.rotation, 'y')
+                .min(0)
+                .max(Math.PI * 2)
+                .name("globe entity rotation y")
         }
 
         // Setup 
         this.modelSize = 2
 
-        this.target = new Objects(this.globeView, this.resources.items.targetModel, 'target', 'lightgreen', this.modelSize)
-        this.chaser = new Objects(this.globeView, this.resources.items.chaserModel, 'chaser', 'lightblue', this.modelSize)
-        this.targetPosManoeuvre = new Objects(this.globeView, this.resources.items.targetPosManoeuvreModel, 'target', '#FFBE0B', this.modelSize)
+        this.target = new Objects(this.globeTarget.object3D, this.globeTarget, this.resources.items.targetModel, 'target', 'lightgreen', this.modelSize)
+        this.chaser = new Objects(this.globeChaser.object3D, this.globeChaser, this.resources.items.chaserModel, 'chaser', 'lightblue', this.modelSize)
+        this.targetPosManoeuvre = new Objects(this.globeTargetPosManoeuvre.object3D, this.globeTargetPosManoeuvre, this.resources.items.targetPosManoeuvreModel, 'target-posmanoeuvre', '#FFBE0B', this.modelSize)
 
         this.setGeometries()
         this.setTextures()
@@ -200,8 +211,13 @@ export default class Globe {
 
         // Globe Entity rotation
         // TODO: Update sunSpherical after the globe rotation
-        let testeCalculateRotationAngle = this.calculateRotationAngle(targetStateVector.z, targetStateVector.x)
-        gsap.to(this.globeView.rotation, 1, { y: THREE.MathUtils.degToRad(testeCalculateRotationAngle), ease: "easeInOut" })
+        let rotationAngle = this.calculateRotationAngle(targetStateVector.x, targetStateVector.z)
+
+        gsap.to(this.globeView.rotation, 1, { y: THREE.MathUtils.degToRad(rotationAngle), ease: "easeInOut" })
+
+        let newSunSpherical = new THREE.Spherical(1, Math.PI * 0.5, -1.4 + THREE.MathUtils.degToRad(rotationAngle));
+        this.sunSpherical.copy(newSunSpherical);
+        this.sun.updateSun();
 
         let a = targetStateVector.x - chaserStateVector.x;
         let b = targetStateVector.y - chaserStateVector.y;
@@ -209,20 +225,38 @@ export default class Globe {
 
         let distance = Math.sqrt(a * a + b * b + c * c);
 
-        // console.log("distance: ", distance)
+        let massScale = this.scaleMass(target.mass.current)
+        // console.log(this.target.covariance.ellipsoid.scale.y * 0.2)
 
         // Scale the positions to fit the 1 unit radius Earth model (2 unit diameter model)
         let scaledTargetPosition = this.scaleCoordinatesToModel([targetStateVector])[0];
         let scaledChaserPosition = this.scaleCoordinatesToModel([chaserStateVector])[0];
 
         if (this.target && this.chaser) {
-            gsap.to(this.target.model.position, 1, { x: scaledTargetPosition.x, y: scaledTargetPosition.y, z: scaledTargetPosition.z, ease: "easeInOut" })
-            gsap.to(this.chaser.model.position, 1, { x: scaledChaserPosition.x, y: scaledChaserPosition.y, z: scaledChaserPosition.z, ease: "easeInOut" })
+            gsap.to(this.target.view.position, 1, { x: scaledTargetPosition.x, y: scaledTargetPosition.y, z: scaledTargetPosition.z, ease: "easeInOut" })
+            gsap.to(this.chaser.view.position, 1, { x: scaledChaserPosition.x, y: scaledChaserPosition.y, z: scaledChaserPosition.z, ease: "easeInOut" })
             // console.log(this.target.popup.mesh.position)
             gsap.to(this.target.popup.mesh.position, 1, { x: scaledTargetPosition.x, y: scaledTargetPosition.y, z: scaledTargetPosition.z, ease: "easeInOut" })
             gsap.to(this.chaser.popup.mesh.position, 1, { x: scaledChaserPosition.x, y: scaledChaserPosition.y, z: scaledChaserPosition.z, ease: "easeInOut" })
+            gsap.to(this.target.model.scale, 1, { x: 0.2 , y: 0.2 , z: 0.2 , ease: "easeInOut" })
+            gsap.to(this.chaser.model.scale, 1, { x: 0.2 , y: 0.2 , z: 0.2 , ease: "easeInOut" })
+            // gsap.to(this.target.covariance.ellipsoid.scale, 1, { x: this.target.covariance.ellipsoid.scale.x * 0.005 , y: this.target.covariance.ellipsoid.scale.y * 0.005 , z: this.target.covariance.ellipsoid.scale.z * 0.005 , ease: "easeInOut" })
+            // gsap.to(this.chaser.covariance.ellipsoid.scale, 1, { x: this.chaser.covariance.ellipsoid.scale.x * 0.005, y: this.chaser.covariance.ellipsoid.scale.y * 0.005, z: this.chaser.covariance.ellipsoid.scale.z * 0.005 , ease: "easeInOut" })
             this.target.covarianceData = dataToDisplay.details.target.covariance
             this.chaser.covarianceData = dataToDisplay.details.chaser.covariance
+        }
+    }
+
+    updateManoeuvre(conjunction) {
+        let dataToDisplay = this.data.conjunctions[conjunction]
+
+        let targetPosManoeuvreStateVector = dataToDisplay.manoeuvres[0].state_vector;
+        // console.log(targetPosManoeuvreStateVector)
+
+        let scaledTargetPosManoeuvrePosition = this.scaleCoordinatesToModel([targetPosManoeuvreStateVector])[0];
+
+        if (this.targetPosManoeuvre) {
+            gsap.to(this.targetPosManoeuvre.view.position, 1, { x: scaledTargetPosManoeuvrePosition.x, y: scaledTargetPosManoeuvrePosition.y, z: scaledTargetPosManoeuvrePosition.z, ease: "easeInOut" })
         }
     }
 
@@ -244,12 +278,20 @@ export default class Globe {
         return scaledPositions;
     }
 
+    scaleMass(originalMass) {
+        let volumeEarth = (4 / 3) * Math.PI * Math.pow(6371000, 3);
+        let volumeModel = Math.pow(this.modelSize, 3);
+        let volumeScalingFactor = volumeModel / volumeEarth;
+        let scaledMass = originalMass * volumeScalingFactor;
+        return scaledMass;
+    }
+
     calculateRotationAngle(x, y) {
         // Calculate the angle in radians
-        let angleRad = Math.atan2(y, x);
+        let angleRad = Math.atan2(x, y);
 
         // Convert the angle to degrees
-        let angleDeg = angleRad * (180 / Math.PI);
+        let angleDeg = - angleRad * (180 / Math.PI);
 
         // Adjust the angle to make sure it is in the range [0, 360]
         if (angleDeg < 0) {

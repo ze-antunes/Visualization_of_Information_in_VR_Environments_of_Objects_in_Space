@@ -40,12 +40,14 @@ export default class World {
             // console.log(this.conjunctions[this.currentConjunctionIndex])
             this.globe.updateVisualization(this.conjunctions[this.currentConjunctionIndex]);
             this.room.updateVisualization(this.conjunctions[this.currentConjunctionIndex]);
+            this.globe.updateManoeuvre(this.conjunctions[this.currentConjunctionIndex]);
+            this.room.updateManoeuvre(this.conjunctions[this.currentConjunctionIndex], 0);
         })
 
         // Listen for buttondown event on the left hand controller
         this.leftHand.addEventListener('buttondown', (e) => {
             // console.log('Left hand button down:', e.detail);
-            if (e.detail.id == 5) {
+            if (e.detail.id == 4) {
                 if (this.conjunctionMenuOpen && this.conjunctionsMenu) {
                     console.log('hide');
                     this.conjunctionsMenu.hide()
@@ -59,20 +61,6 @@ export default class World {
                 this.conjunctionMenuOpen = !this.conjunctionMenuOpen;
             }
         });
-
-        // // Initialize the value and the max value
-        // let intValue = 0;
-        // let maxValue = 4;
-
-        // document.addEventListener("keydown", function (e) {
-        //     if (e.key === "e") {
-        //         intValue = (intValue + 1) % (maxValue + 1);
-        //     }
-        //     if (e.key === "r") {
-        //         intValue = (intValue - 1 + (maxValue + 1)) % (maxValue + 1);
-        //     }
-        //     console.log(intValue)
-        // });
 
         this.leftHand.addEventListener('axismove', (e) => {
             console.log("logThumbstick", e.detail)
@@ -93,12 +81,15 @@ export default class World {
         this.conjunctionsMenu.setHeader()
         this.conjunctionsMenu.setGrid(this.data.conjunctions, 4)
         this.conjunctionsMenu.setViews()
+
+        if (this.conjunctionsMenu.grid)
+            this.conjunctionsMenu.grid.cards[0].setActive(true)
     }
 
     update() {
         if (this.globe)
             this.globe.update()
-                
+
         if (this.room)
             this.room.update()
 

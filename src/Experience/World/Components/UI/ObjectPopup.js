@@ -5,7 +5,7 @@ import FontJSON from '../../../../fonts/Roboto-msdf.json'
 import FontImage from '../../../../fonts/Roboto-msdf.png'
 
 export default class ObjectPopup {
-    constructor(title, objectInfo, object) {
+    constructor(title, objectInfo, object, view) {
         this.experience = new Experience()
         this.scene = this.experience.scene
         this.camera = this.experience.camera
@@ -16,6 +16,7 @@ export default class ObjectPopup {
         this.title = title
         this.title = this.title.trim();
         this.title = this.title.charAt(0).toUpperCase() + this.title.slice(1);
+        this.view = view
         this.object = object
         this.objectInfo = objectInfo
         this.isOpen = false
@@ -44,7 +45,7 @@ export default class ObjectPopup {
         });
 
         // this.mesh.position.set(0, 1.6, -1)
-        this.mesh.scale.set(0.5, 0.5, 0.5)
+        // this.mesh.scale.set(5, 5, 5)
 
         // HEADER
         this.header = new ThreeMeshUI.Block({
@@ -184,7 +185,7 @@ export default class ObjectPopup {
         this.header.add(title, options)
         this.main.add(this.cosparId, this.span, this.mass)
         this.mesh.add(this.header, this.main)
-        this.object.view.add(this.mesh)
+        this.view.add(this.mesh)
     }
 
     hide() {

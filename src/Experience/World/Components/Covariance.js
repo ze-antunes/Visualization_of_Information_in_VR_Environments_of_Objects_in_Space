@@ -24,13 +24,15 @@ export default class Covariance {
         let P = [
             [this.data.cr_r, this.data.ct_r, this.data.cn_r],
             [this.data.ct_r, this.data.ct_t, this.data.cn_t],
-            [this.data.cn_r, this.data.cn_t, this.data.cn_n]
+            [this.data.cn_r, this.data.cn_t, this.data.cn_n],
         ];
-
+        // console.log(this.data)
+        
         // Perform eigenvalue decomposition
         let eigResult = MATHJS.eigs(P);
         let eigenvalues = eigResult.values;
         let eigenvectors = eigResult.eigenvectors;
+        // console.log(eigResult)
 
         // Calculate the lengths of the semi-axes
         let semiAxesLengths = eigenvalues.map(Math.sqrt);
@@ -46,17 +48,16 @@ export default class Covariance {
             side: THREE.DoubleSide,
             // wireframe: true
         });
-        let ellipsoid = new THREE.Mesh(ellipsoidGeometry, ellipsoidMaterial);
-        ellipsoid.position.set(0, 0, 0)
+        this.ellipsoid = new THREE.Mesh(ellipsoidGeometry, ellipsoidMaterial);
+        this.ellipsoid.position.set(0, 0, 0)
+        // this.ellipsoid.scale.set(semiAxesLengths[0], semiAxesLengths[1], semiAxesLengths[2]);
+        this.ellipsoid.scale.set(semiAxesLengths[0] * 0.1, semiAxesLengths[1] * 0.1, semiAxesLengths[2] * 0.001);
 
         // Scale the ellipsoid
         // Model size (2 meters)
         let scaledSemiAxesLengths = this.scaleToModel(semiAxesLengths, this.modelSize);
-        // console.log('Scaled Semi-Axes Lengths:', scaledSemiAxesLengths);
         // ellipsoid.scale.set(scaledSemiAxesLengths[0], scaledSemiAxesLengths[1], scaledSemiAxesLengths[2]);
 
-        ellipsoid.scale.set(semiAxesLengths[0] * 0.01, semiAxesLengths[1] * 0.01, semiAxesLengths[2] * 0.0001);
-        // ellipsoid.scale.set(semiAxesLengths[0], semiAxesLengths[1], semiAxesLengths[2]);
  
         // Apply rotation to align with eigenvectors
         let rotationMatrix = new THREE.Matrix4();
@@ -66,9 +67,9 @@ export default class Covariance {
             eigenvectors[2].vector[0], eigenvectors[2].vector[1], eigenvectors[2].vector[2], 0,
             0, 0, 0, 1
         );
-        ellipsoid.applyMatrix4(rotationMatrix);
+        this.ellipsoid.applyMatrix4(rotationMatrix);
 
-        this.object.add(ellipsoid)
+        this.object.add(this.ellipsoid)
     }
 
     scaleToModel(semiAxesLengths, modelSize) {

@@ -41,7 +41,9 @@ export default class ManoeuvrePopup {
             backgroundOpacity: 1,
         });
 
-        this.mesh.position.set(0, 1.6, -1)
+        // this.mesh.position.set(0, 1.6, -1)
+        this.mesh.position.set(2.4, 1.6, -1.2);
+        this.mesh.rotation.y = -0.25;
         this.mesh.scale.set(0.5, 0.5, 0.5)
 
         // HEADER

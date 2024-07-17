@@ -78,6 +78,7 @@ export default class ConjunctionCard {
             attributes: selectedAttributes,
             onSet: () => {
                 this.experience.world.conjunctionsMenu.grid.setActiveCard(this)
+                this.world.currentConjunctionIndex = this.id
                 this.world.globe.updateVisualization(this.id)
                 this.world.room.updateVisualization(this.id)
             }
@@ -108,14 +109,14 @@ export default class ConjunctionCard {
             contentDirection: 'row',
             textAlign: 'left',
             backgroundOpacity: 0,
-            borderWidth: 0
+            borderWidth: 0,
+            bestFit: "shrink"
         });
 
         CardNameId.add(
             new ThreeMeshUI.Text({ content: this.cardInfo.target.name }),
-            // new ThreeMeshUI.Text({ content: this.id.toString() }),
             new ThreeMeshUI.Text({
-                content: "\nDummy data",
+                content: "\n" + this.cardInfo.target.cospar_id,
                 fontColor: new THREE.Color("#DEDEDE"),
                 fontSize: 0.045
             }),
@@ -145,10 +146,12 @@ export default class ConjunctionCard {
             borderWidth: 0
         });
 
+        // console.log(this.cardInfo.summary)
+
         CardTCA.add(
             new ThreeMeshUI.Text({ content: this.setValueTCA(this.cardInfo.summary.tca_latest) }),
             new ThreeMeshUI.Text({
-                content: "\nDummy data",
+                content: "\n" + this.cardInfo.summary.miss_distance_latest + "m",
                 fontColor: new THREE.Color("#DEDEDE"),
                 fontSize: 0.045
             }),
@@ -216,6 +219,9 @@ export default class ConjunctionCard {
         this.manoeuvresMenu.mesh.scale.set(0.5, 0.5, 0.5)
         this.manoeuvresMenu.setHeader()
         this.manoeuvresMenu.setGrid(this.cardInfo.manoeuvres, 7)
+
+        if (this.manoeuvresMenu.grid)
+            this.manoeuvresMenu.grid.cards[0].setActive(true)
     }
 
     destroy() {

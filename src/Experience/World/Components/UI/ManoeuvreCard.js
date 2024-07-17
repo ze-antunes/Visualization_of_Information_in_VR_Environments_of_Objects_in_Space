@@ -7,6 +7,7 @@ import Panel from './Panel'
 export default class ManoeuvreCard {
     constructor(grid, cardInfo, id, panel) {
         this.experience = new Experience()
+        this.world = this.experience.world
         this.time = this.experience.time
         this.resources = this.experience.resources
 
@@ -77,6 +78,7 @@ export default class ManoeuvreCard {
             state: 'selected',
             attributes: selectedAttributes,
             onSet: () => {
+                this.world.room.updateManoeuvre(this.world.currentConjunctionIndex, this.id)
                 if (this.panel.grid)
                     this.panel.grid.setActiveCard(this)
             }
@@ -131,6 +133,7 @@ export default class ManoeuvreCard {
             borderWidth: 0
         });
 
+
         if (this.cardInfo.type === "thrust") {
             CardStatus.set({
                 backgroundColor: new THREE.Color("#FFBE0B"),
@@ -141,7 +144,7 @@ export default class ManoeuvreCard {
                 backgroundColor: new THREE.Color("#FB5607"),
                 backgroundTexture: this.textures.impulsiveManoeuvre,
             });
-        } else if (this.cardInfo.type === "drag") {
+        } else if (this.cardInfo.type === "differential_drag") {
             CardStatus.set({
                 backgroundColor: new THREE.Color("#8338EC"),
                 backgroundTexture: this.textures.dragManoeuvre,
@@ -227,7 +230,7 @@ export default class ManoeuvreCard {
             if (this.popup) {
                 if (this.popup.isOpen == false)
                     this.popup.show()
-                else 
+                else
                     this.popup.hide()
             }
         } else {

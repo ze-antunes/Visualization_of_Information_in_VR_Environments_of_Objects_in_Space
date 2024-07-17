@@ -5,7 +5,7 @@ import Trajectory from './Trajectory'
 import ObjectPopup from './UI/ObjectPopup'
 
 export default class Objects {
-    constructor(view, resource, type, color, modelSize) {
+    constructor(view, htmlElement, resource, type, color, modelSize) {
         this.experience = new Experience()
         this.scene = this.experience.scene
         this.time = this.experience.time
@@ -16,42 +16,40 @@ export default class Objects {
         this.type = type
         this.color = color
         this.view = view
+        this.htmlElement = htmlElement
         this.modelSize = modelSize
         this.objsToTest = this.experience.raycaster.objsToTest
 
+        // this.htmlElement.addEventListener("mouseenter", () => {
+        //     if (this.popup)
+        //         this.popup.show()
+        // })
+
         this.isPopupOpen = false
-        if (this.type === "target") {
+        if (this.type === "target" || this.type === "target-posmanoeuvre") {
             this.covarianceData = this.experience.data.conjunctions[0].details.target.covariance
-            console.log(this.experience.data.conjunctions[0].details.target)
+            // console.log(this.experience.data.conjunctions[0].manoeuvres[0])
+            // console.log(this.experience.data.conjunctions[0].details.target)
         }
         else {
             this.covarianceData = this.experience.data.conjunctions[0].details.chaser.covariance
-            console.log(this.experience.data.conjunctions[0].details.target)
+            // console.log(this.experience.data.conjunctions[0].details.target)
         }
 
         this.setModel()
 
         if (this.model && this.modelParameters) {
-            this.covariance = new Covariance(this.model, this.modelParameters, this.type, this.covarianceData, this.modelSize)
-            this.trajectory = new Trajectory(this.model, this.modelParameters, this.trajectoryData)
+            this.covariance = new Covariance(this.view, this.modelParameters, this.type, this.covarianceData, this.modelSize)
+            this.trajectory = new Trajectory(this.view, this.modelParameters, this.trajectoryData)
         }
     }
 
     setModel() {
         this.model = this.resource.scene
         this.modelParameters = {}
-        // this.modelParameters.trajectoryThetaAngle = this.theta
-        // this.modelParameters.trajectoryPhiAngle = this.phi
-        // this.modelParameters.trajectoryRadius = this.radius
         this.modelParameters.color = new THREE.Color(this.color)
-        // this.modelParameters.velocity = this.velocity
-        // console.log(this.modelParameters.color)
-
-        this.model.scale.set(0.05, 0.05, 0.05)
-        // if (this.type === "target")
-        //     this.model.scale.set(0.05, 0.05, 0.05)
-        // else
-        //     this.model.scale.set(0.005, 0.005, 0.005)
+        this.view.scale.set(0.05, 0.05, 0.05)
+        // this.model.scale.set(0.5, 0.5, 0.5)
         this.model.hasStates = true
         this.model.states = {}
 
@@ -77,15 +75,11 @@ export default class Objects {
     }
 
     setPopup() {
-        this.popup = new ObjectPopup(this.type, "LEMUR-2-ZACHARY", this);
+        this.popup = new ObjectPopup(this.type, "LEMUR-2-ZACHARY", this, this.view);
         this.model.popup = this.popup
     }
 
     update() {
-        // this.model.thetaAngle = this.time.elapsed * this.modelParameters.velocity
-        // this.model.position.x = Math.cos(this.model.thetaAngle) * this.modelParameters.trajectoryRadius
-        // this.model.position.y = Math.sin(this.model.thetaAngle) * Math.sin(this.modelParameters.trajectoryPhiAngle) * this.modelParameters.trajectoryRadius
-        // this.model.position.z = Math.sin(this.model.thetaAngle) * Math.cos(this.modelParameters.trajectoryPhiAngle) * this.modelParameters.trajectoryRadius
         this.popup.update()
     }
 

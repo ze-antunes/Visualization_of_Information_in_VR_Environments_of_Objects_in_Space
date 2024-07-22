@@ -71,7 +71,8 @@ let renderer
 
 
 setTimeout(() => {
-    camera = cameraComponent.camera.camera;
+    // camera = cameraComponent.camera.camera;
+    camera = new THREE.OrthographicCamera(width / - 2, width / 2, height / 2, height / - 2, 1, 1000);
 
     renderer = aframeScene.renderer;
     // renderer.shadowMap.enabled = true;
@@ -388,9 +389,9 @@ let semiAxesLengths = eigenvalues.map(Math.sqrt);
 
 // Create the ellipsoid
 let ellipsoidGeometry = new THREE.SphereGeometry(1, 32, 32);
-let ellipsoidMaterial = new THREE.MeshPhongMaterial({ color: 0x00ffff, wireframe: false });
+let ellipsoidMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: false });
 let ellipsoid = new THREE.Mesh(ellipsoidGeometry, ellipsoidMaterial);
-ellipsoid.position.set(0, 0, 0)
+ellipsoid.position.set(3, 3, 3)
 
 // Scale the ellipsoid
 ellipsoid.scale.set(semiAxesLengths[0], semiAxesLengths[1], semiAxesLengths[2]);
@@ -407,15 +408,15 @@ ellipsoid.applyMatrix4(rotationMatrix);
 
 scene.add(ellipsoid);
 
-// Find extremal points of the ellipsoid in world coordinates
+// Find the points from the ellipsoid in world coordinates
 let boundingBox = new THREE.Box3().setFromObject(ellipsoid);
 let maxY = boundingBox.max.y;
 let minY = boundingBox.min.y;
 let maxX = boundingBox.max.x;
 let minX = boundingBox.min.x;
 
-// Define plane geometry large enough to encompass the ellipsoid's projection
-let planeGeometry = new THREE.PlaneGeometry(15, 15); // Adjust size as needed
+// Define plane geometry
+let planeGeometry = new THREE.PlaneGeometry(100, 100); // Adjust size
 let planeMaterial = new THREE.ShaderMaterial({
     uniforms: {
         maxY: { value: maxY },
@@ -462,12 +463,13 @@ let planeMaterial = new THREE.ShaderMaterial({
             }
         }
     `,
-    side: THREE.DoubleSide // Ensure both sides of the plane are rendered
+    side: THREE.DoubleSide
 });
 
 // Create the plane mesh
 let plane = new THREE.Mesh(planeGeometry, planeMaterial);
-plane.position.set(0, 0, -3); // Position the plane appropriately
+plane.position.set(0, 0, 0); // Position the plane
+// plane.rotation.set(0, Math.PI / 2, 0)
 scene.add(plane);
 
 let ellipsoidTweaks = gui.addFolder("Ellipsoid")
@@ -500,17 +502,17 @@ let clock = new THREE.Clock()
 let tick = () => {
     let elapsedTime = clock.getElapsedTime()
 
-        ellipsoid.rotation.x += 0.01;
-        ellipsoid.rotation.y += 0.01;
+        // ellipsoid.rotation.x += 0.01;
+        // ellipsoid.rotation.y += 0.01;
 
-    // Update uniforms for extremal points
+    // Update uniforms for the points
     boundingBox.setFromObject(ellipsoid);
-    plane.material.uniforms.maxY.value = boundingBox.max.y;
-    plane.material.uniforms.minY.value = boundingBox.min.y;
-    plane.material.uniforms.maxX.value = boundingBox.max.x;
-    plane.material.uniforms.minX.value = boundingBox.min.x;
+    plane.material.uniforms.maxY.value = boundingBox.max.y
+    plane.material.uniforms.minY.value = boundingBox.min.y
+    plane.material.uniforms.maxX.value = boundingBox.max.x
+    plane.material.uniforms.minX.value = boundingBox.min.x
 
-    // Call tick again on the next frame
+    // Call tick on the next frame
     window.requestAnimationFrame(tick)
 }
 

@@ -41,10 +41,10 @@ export default class ManoeuvrePopup {
             backgroundOpacity: 1,
         });
 
-        // this.mesh.position.set(0, 1.6, -1)
-        this.mesh.position.set(2.4, 1.6, -1.2);
-        this.mesh.rotation.y = -0.25;
-        this.mesh.scale.set(0.5, 0.5, 0.5)
+        // this.mesh.position.set(0, 1.3, -1)
+        // this.mesh.position.set(2.4, 1.6, -1.2);
+        this.mesh.rotation.x = -0.35;
+        // this.mesh.scale.set(0.5, 0.5, 0.5)
 
         // HEADER
         this.header = new ThreeMeshUI.Block({
@@ -176,7 +176,7 @@ export default class ManoeuvrePopup {
 
         this.missDistanceBlock.add(
             new ThreeMeshUI.Text({
-                content: "Miss Distance",
+                content: "Post-manoeuvre Miss Distance",
                 fontSize: 0.045
             }),
             new ThreeMeshUI.Text({
@@ -214,7 +214,8 @@ export default class ManoeuvrePopup {
     }
 
     show() {
-        this.mesh.scale.set(0.5, 0.5, 0.5)
+        this.mesh.scale.set(0.3, 0.3, 0.3)
+        this.mesh.position.set(this.experience.camera.object3D.position.x, 1.3, this.experience.camera.object3D.position.z - 0.5)
         this.isOpen = true
     }
 

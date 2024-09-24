@@ -40,7 +40,7 @@ export default class Objects {
 
         if (this.model && this.modelParameters) {
             this.covariance = new Covariance(this.view, this.modelParameters, this.type, this.covarianceData, this.modelSize)
-            this.trajectory = new Trajectory(this.view, this.modelParameters, this.trajectoryData)
+            // this.trajectory = new Trajectory(this.view, this.modelParameters, this.trajectoryData)
         }
     }
 

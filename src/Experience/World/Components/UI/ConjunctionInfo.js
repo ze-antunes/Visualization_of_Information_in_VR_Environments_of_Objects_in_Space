@@ -278,7 +278,7 @@ export default class ConjunctionInfo {
         CardTCA.add(
             new ThreeMeshUI.Text({ content: "TCA" }),
             new ThreeMeshUI.Text({
-                content: "\nTime to TCA",
+                content: "\nMiss distance",
                 fontColor: new THREE.Color("#DEDEDE"),
                 fontSize: 0.045
             }),

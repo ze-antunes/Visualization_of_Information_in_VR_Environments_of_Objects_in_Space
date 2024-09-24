@@ -101,7 +101,7 @@ export default class Room {
 
         // Create the line
         this.line = new THREE.Line(this.lineGeometry, this.lineMaterial);
-        this.roomView.add(this.line)
+        this.roomConjunction.object3D.add(this.line)
     }
 
     updateVisualization(conjunction) {
@@ -160,8 +160,9 @@ export default class Room {
             // console.log(this.target.view.position, this.chaser.view.position)
             // gsap.to(this.target.model.scale, 1, { x: mappedDistances[0], y: mappedDistances[1], z: mappedDistances[2], ease: "easeInOut" })
             // gsap.to(this.chaser.model.scale, 1, { x: -mappedDistances[0], y: -mappedDistances[1], z: -mappedDistances[2], ease: "easeInOut" })
-            this.target.covarianceData = dataToDisplay.details.target.covariance
-            this.chaser.covarianceData = dataToDisplay.details.chaser.covariance
+            this.target.covariance.update(dataToDisplay.details.target.covariance)
+            this.targetPosManoeuvre.covariance.update(dataToDisplay.details.target.covariance)
+            this.chaser.covariance.update(dataToDisplay.details.chaser.covariance)
         }
 
         this.updateManoeuvre(conjunction, 0)

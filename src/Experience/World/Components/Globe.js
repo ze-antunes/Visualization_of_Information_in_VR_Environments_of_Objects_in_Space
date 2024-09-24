@@ -44,7 +44,7 @@ export default class Globe {
         this.targetPosManoeuvre = new Objects(this.globeTargetPosManoeuvre.object3D, this.globeTargetPosManoeuvre, this.resources.items.targetPosManoeuvreModel, 'target-posmanoeuvre', '#FFBE0B', this.modelSize)
 
         this.setGeometries()
-        this.setTextures()
+        this.setTextures() 
         this.setMaterials()
         this.setMesh()
         this.setSun()
@@ -195,6 +195,7 @@ export default class Globe {
     }
 
     updateVisualization(conjunction) {
+
         let dataToDisplay = this.data.conjunctions[conjunction]
         // console.log(dataToDisplay)
         // Information about the target and chaser space objects
@@ -235,6 +236,9 @@ export default class Globe {
         if (this.target && this.chaser) {
             gsap.to(this.target.view.position, 1, { x: scaledTargetPosition.x, y: scaledTargetPosition.y, z: scaledTargetPosition.z, ease: "easeInOut" })
             gsap.to(this.chaser.view.position, 1, { x: scaledChaserPosition.x, y: scaledChaserPosition.y, z: scaledChaserPosition.z, ease: "easeInOut" })
+        }
+
+        
             // console.log(this.target.popup.mesh.position)
             gsap.to(this.target.popup.mesh.position, 1, { x: scaledTargetPosition.x, y: scaledTargetPosition.y, z: scaledTargetPosition.z, ease: "easeInOut" })
             gsap.to(this.chaser.popup.mesh.position, 1, { x: scaledChaserPosition.x, y: scaledChaserPosition.y, z: scaledChaserPosition.z, ease: "easeInOut" })
@@ -242,8 +246,12 @@ export default class Globe {
             gsap.to(this.chaser.model.scale, 1, { x: 0.2 , y: 0.2 , z: 0.2 , ease: "easeInOut" })
             // gsap.to(this.target.covariance.ellipsoid.scale, 1, { x: this.target.covariance.ellipsoid.scale.x * 0.005 , y: this.target.covariance.ellipsoid.scale.y * 0.005 , z: this.target.covariance.ellipsoid.scale.z * 0.005 , ease: "easeInOut" })
             // gsap.to(this.chaser.covariance.ellipsoid.scale, 1, { x: this.chaser.covariance.ellipsoid.scale.x * 0.005, y: this.chaser.covariance.ellipsoid.scale.y * 0.005, z: this.chaser.covariance.ellipsoid.scale.z * 0.005 , ease: "easeInOut" })
-            this.target.covarianceData = dataToDisplay.details.target.covariance
-            this.chaser.covarianceData = dataToDisplay.details.chaser.covariance
+            this.target.covariance.update(dataToDisplay.details.target.covariance)
+            this.targetPosManoeuvre.covariance.update(dataToDisplay.details.target.covariance)
+            this.chaser.covariance.update(dataToDisplay.details.chaser.covariance)
+            this.target.covariance.ellipsoid.scale.set(this.target.covariance.ellipsoid.scale.x * 0.3, this.target.covariance.ellipsoid.scale.y * 0.3, this.target.covariance.ellipsoid.scale.z * 0.3)
+            this.targetPosManoeuvre.covariance.ellipsoid.scale.set(this.targetPosManoeuvre.covariance.ellipsoid.scale.x * 0.3, this.targetPosManoeuvre.covariance.ellipsoid.scale.y * 0.3, this.targetPosManoeuvre.covariance.ellipsoid.scale.z * 0.3)
+            this.chaser.covariance.ellipsoid.scale.set(this.chaser.covariance.ellipsoid.scale.x * 0.3, this.chaser.covariance.ellipsoid.scale.y * 0.3, this.chaser.covariance.ellipsoid.scale.z * 0.3)
         }
     }
 

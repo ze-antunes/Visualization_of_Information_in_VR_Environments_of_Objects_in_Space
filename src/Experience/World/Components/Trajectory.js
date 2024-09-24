@@ -9,7 +9,7 @@ export default class Trajectory {
         this.object = object
         this.objectParameters = objectParameters
         this.globeView = this.experience.globeView
-        
+
         // Setup
         this.trajectoryData = trajectoryData
         this.mu = 398600.4418; //  μ=398600.4418km^3/s^2 (standard gravitational parameter for Earth)
@@ -20,7 +20,7 @@ export default class Trajectory {
         this.realLifeDiameter = 12742000;
         this.modelDiameter = 2;
         this.scalingFactor = this.modelDiameter / this.realLifeDiameter;
-        
+
         // TODO: Update trajectory data
         // Initial state vector [x0, y0, z0, vx0, vy0, vz0]
         this.state0 = [
@@ -34,45 +34,9 @@ export default class Trajectory {
 
         this.trajectory = this.propagate(this.state0, this.tSpan, this.dt);
 
-        this.setGeometry()
         this.setMaterial()
+        this.setTrajectory()
         this.setMesh()
-    }
-
-    setGeometry() {
-        this.geometry = new THREE.BufferGeometry()
-        let count = 100
-
-        // Dummy Test
-        // let positions = new Float32Array(count * 3)
-
-        // for (let i = 0; i < count; i++) {
-        //     let thetaAngle = (i / count) * 1
-        //     let y = Math.sin(thetaAngle) * Math.sin(1) * 2
-        //     let x = Math.cos(thetaAngle) * 2
-        //     let z = Math.sin(thetaAngle) * Math.cos(1) * 2
-
-        //     // Calculate the index for the current point
-        //     let index = i * 3;
-
-        //     // Store the coordinates in the array
-        //     positions[index] = x;
-        //     positions[index + 1] = y;
-        //     positions[index + 2] = z;
-        // }
-
-        // // Convert trajectory points to THREE.js format
-        let positions = new Float32Array(count * 3);
-        for (let i = 0; i < count; i++) {
-            positions[i * 3] = this.trajectory.trajectory[i][0] * this.scalingFactor;
-            positions[i * 3 + 1] = this.trajectory.trajectory[i][1] * this.scalingFactor;
-            positions[i * 3 + 2] = this.trajectory.trajectory[i][2] * this.scalingFactor;
-        }
-
-        // console.log(positions)
-
-        // Calculated and scaled positions from the orbital propagation
-        this.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
     }
 
     setMaterial() {
@@ -82,6 +46,22 @@ export default class Trajectory {
             dashSize: 0.05,
             gapSize: 0.05
         })
+    }
+
+    setTrajectory() {
+        this.geometry = new THREE.BufferGeometry()
+        let count = 100
+
+        // // Convert trajectory points to THREE.js format
+        let positions = new Float32Array(count * 3);
+        for (let i = 0; i < count; i++) {
+            positions[i * 3] = this.trajectory.trajectory[i][0] * this.scalingFactor;
+            positions[i * 3 + 1] = this.trajectory.trajectory[i][1] * this.scalingFactor;
+            positions[i * 3 + 2] = this.trajectory.trajectory[i][2] * this.scalingFactor;
+        }
+
+        // Calculated and scaled positions from the orbital propagation
+        this.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
     }
 
     setMesh() {

@@ -1,7 +1,7 @@
 # [Visualization of Information in VR Environments to Support the Monitoring and Analysis of Objects in Space](https://baes.uc.pt/handle/10316/118087?mode=full)
 
 <p align="center">
-  <img src="./Documents/[DS] Design/VRSatelliteVisualization-GoogleChrome2025-03-1322-30-18-ezgif.com-video-to-gif-converter.gif" alt="Preview"/>
+  <img src="./Documents/%5BDS%5D%20Design/VRSatelliteVisualization-GoogleChrome2025-03-1322-30-18-ezgif.com-video-to-gif-converter.gif" alt="Preview"/>
 </p>
 
 **Dissertation Project**  
@@ -121,7 +121,7 @@ The project structure is as follows:
 Visualization_of_Information_in_VR_Environments_of_Objects_in_Space/
 │
 ├── Documents/                   # Documentation related to the project
-│   ├── [DS] Design/             # Design files, mockups, and prototypes
+│   ├── %5BDS%5D%20Design/             # Design files, mockups, and prototypes
 │   └── [QA] Quality/            # Quality assurance documents and processes
 │
 ├── Exploration/                 # Experimental explorations and tests
@@ -183,33 +183,33 @@ Visualization_of_Information_in_VR_Environments_of_Objects_in_Space/
 
 ### Additional Setup
 
-- Ensure that you have access to the necessary satellite data, as described in the documentation. (In this case, the application is running a sample from the Neuraspace dataset)
+- Please make sure that you have access to the necessary satellite data, as described in the documentation. (In this case, the application is running a sample from the Neuraspace dataset)
 
 ## Images & Diagrams
 
 ### Project Overview
 
 <p align="center">
-  <img src="./Documents/[DS] Design/screen_shots/image4.jpg" alt="Project Overview 1" width="45%"/>
-  <img src="./Documents/[DS] Design/screen_shots/image55.jpg" alt="Project Overview 2" width="45%"/>
+  <img src="./Documents/%5BDS%5D%20Design/screen_shots/image4.jpg" alt="Project Overview 1" width="45%"/>
+  <img src="./Documents/%5BDS%5D%20Design/screen_shots/image55.jpg" alt="Project Overview 2" width="45%"/>
 </p>
 
 ### Design Mockups
 
 <p align="center">
-  <img src="./Documents/[DS] Design/screen_shots/image35.jpg" alt="ShapesXR 1" width="45%"/>
-  <img src="./Documents/[DS] Design/screen_shots/Imagem_shapes1.jpg" alt="ShapesXR 2" width="45%"/>
+  <img src="./Documents/%5BDS%5D%20Design/screen_shots/image35.jpg" alt="ShapesXR 1" width="45%"/>
+  <img src="./Documents/%5BDS%5D%20Design/screen_shots/Imagem_shapes1.jpg" alt="ShapesXR 2" width="45%"/>
 </p>
 
 <p align="center">
-  <img src="./Documents/[DS] Design/screen_shots/Group 1881.png" alt="UI" width="91%"/>
+  <img src="./Documents/%5BDS%5D%20Design/screen_shots/Group 1881.png" alt="UI" width="91%"/>
 </p>
 
 ### VR Environment Screenshots
 
 <p align="center">
-  <img src="./Documents/[DS] Design/screen_shots/image41.jpg" alt="VR Environment Screenshots 1" width="45%"/>
-  <img src="./Documents/[DS] Design/screen_shots/Imagem WhatsApp 2024-09-06 às 09.20.30_afddc5c6.jpg" alt="VR Environment Screenshots 2" width="45%"/>
+  <img src="./Documents/%5BDS%5D%20Design/screen_shots/image41.jpg" alt="VR Environment Screenshots 1" width="45%"/>
+  <img src="./Documents/%5BDS%5D%20Design/screen_shots/Imagem WhatsApp 2024-09-06 às 09.20.30_afddc5c6.jpg" alt="VR Environment Screenshots 2" width="45%"/>
 </p>
 
 ## Acknowledgements

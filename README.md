@@ -1,7 +1,7 @@
 # [Visualization of Information in VR Environments to Support the Monitoring and Analysis of Objects in Space](https://baes.uc.pt/handle/10316/118087?mode=full)
 
 <p align="center">
-  <img src="./Documents/%5BDS%5D%20Design/VRSatelliteVisualization-GoogleChrome2025-03-1322-30-18-ezgif.com-video-to-gif-converter.gif" alt="Preview"/>
+  <img src="./Documents/%5BDS%5D%20Design/VRSatelliteVisualization-GoogleChrome2025-03-1322-30-18-ezgif.com-video-to-gif-converter.gif" alt="Preview" width="100%"/>
 </p>
 
 **Dissertation Project**  

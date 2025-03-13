@@ -236,8 +236,6 @@ export default class Globe {
         if (this.target && this.chaser) {
             gsap.to(this.target.view.position, 1, { x: scaledTargetPosition.x, y: scaledTargetPosition.y, z: scaledTargetPosition.z, ease: "easeInOut" })
             gsap.to(this.chaser.view.position, 1, { x: scaledChaserPosition.x, y: scaledChaserPosition.y, z: scaledChaserPosition.z, ease: "easeInOut" })
-        }
-
         
             // console.log(this.target.popup.mesh.position)
             gsap.to(this.target.popup.mesh.position, 1, { x: scaledTargetPosition.x, y: scaledTargetPosition.y, z: scaledTargetPosition.z, ease: "easeInOut" })
